@@ -7,9 +7,11 @@ from .serialazer import TerceiroSerializer
 
 
 class TerceiroAdmin(admin.ModelAdmin):
-    list_display = ('nome', 'email', 'telefone', 'endereco', 'cidade', 'estado', 'cep')
-    search_fields = ('nome', 'email', 'telefone', 'endereco', 'cidade', 'estado', 'cep')
-    list_filter = ('estado', 'cidade')
+    list_display = ("nome", "telefone")
+    search_fields = ("nome", "telefone")
+    list_display_links = ("nome", "telefone")
+    list_filter = ("nome", "telefone")
     list_per_page = 10
+
 
 admin.site.register(Terceiro, TerceiroAdmin)
