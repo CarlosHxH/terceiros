@@ -12,6 +12,7 @@ Credentials({
     password: { label: 'Password', type: 'password' },
   },
   authorize(c) {
+
     return {
       id: 'test',
       name: 'Test User',
@@ -22,7 +23,7 @@ Credentials({
 ];
 
 if(!process.env.DATABASE_URL) { 
-console.warn('The passkey provider requires configuring a database.')
+  console.warn('The passkey provider requires configuring a database.')
 }
 
 
