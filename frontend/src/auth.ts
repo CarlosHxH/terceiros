@@ -12,9 +12,6 @@ Credentials({
     password: { label: 'Password', type: 'password' },
   },
   authorize(c) {
-    if (c.password !== '#5s2024@') {
-      return null;
-    }
     return {
       id: 'test',
       name: 'Test User',

@@ -6,8 +6,9 @@ import PersonIcon from '@mui/icons-material/Person';
 
 import type { Navigation } from '@toolpad/core/AppProvider';
 import { SessionProvider, signIn, signOut } from 'next-auth/react';
-import { auth } from '../auth';
-import theme from '../theme';
+import { auth } from '@/auth';
+import theme from '@/theme';
+import Image from 'next/image';
 
 export const metadata = {
   title: 'My Toolpad Core Next.js App',
@@ -34,7 +35,7 @@ const NAVIGATION: Navigation = [
 
 const BRANDING = {
   title: 'Ponto Facil',
-  logo: 'next.svg',
+  logo: <Image width={100} height={100} priority src='/next.svg' alt="Logo" style={{ height: 32 }} />,
 };
 
 
