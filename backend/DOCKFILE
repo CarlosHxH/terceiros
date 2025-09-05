@@ -1,0 +1,11 @@
+# Use the official PostgreSQL image as the base
+FROM postgres:latest
+
+# Set environment variables (optional, can also be set during container run)
+ENV POSTGRES_DB=terceiros
+ENV POSTGRES_USER=admin
+ENV POSTGRES_PASSWORD=#5s2024@
+
+# Copy SQL initialization scripts (optional)
+# Files in /docker-entrypoint-initdb.d/ are executed when the container starts for the first time
+COPY init.sql /docker-entrypoint-initdb.d/
