@@ -1,3 +1,5 @@
+import { CameraAlt, RefreshOutlined } from "@mui/icons-material";
+import { Box, IconButton } from "@mui/material";
 import React, { useRef, useState } from "react";
 import Webcam from "react-webcam";
 
@@ -24,51 +26,64 @@ const WebcamCapture = () => {
 
   return (
     <div className="w-full h-full bg-gray-200 flex items-center justify-center">
-      <div style={{ position: 'relative' }}>
+      <div style={{ position: 'relative', paddingBottom: 20 }}>
         {!pick ? (
-          <Webcam
-            audio={false}
-            height={300}
-            width={300}
-            screenshotFormat="image/jpeg"
-            videoConstraints={videoConstraints}
-            ref={webcamRef}
-            style={{ 
-              borderRadius: '50%', 
-              cursor: 'pointer', 
-              transform: 'scaleX(-1)' 
-            }}
-          />
+          <>
+            <Webcam
+              audio={false}
+              height={300}
+              width={300}
+              screenshotFormat="image/jpeg"
+              videoConstraints={videoConstraints}
+              ref={webcamRef}
+              style={{
+                borderRadius: '50%',
+                cursor: 'pointer',
+                transform: 'scaleX(-1)',
+              }}
+            />
+            <Box
+              sx={{
+                width: 300,
+                height: 300,
+                position: 'absolute',
+                top: 0,
+                left: 0,
+                right: 0,
+                bottom: 0,
+                backgroundImage: `url(/personFrame.png)`,
+                backgroundSize: 'cover',
+                backgroundRepeat: 'no-repeat',
+                backgroundPosition: 'center',
+                pointerEvents: 'none',
+                zIndex: 10,
+                borderRadius: '50%',
+              }}
+            />
+          </>
         ) : (
-          <img 
-            src={pick} 
-            style={{ 
-              borderRadius: '50%', 
-              cursor: 'pointer', 
+          <img
+            src={pick}
+            style={{
+              borderRadius: '50%',
+              cursor: 'pointer',
               transform: 'scaleX(-1)',
               width: 300,
               height: 300,
               objectFit: 'cover'
-            }} 
-            alt="Captured" 
+            }}
+            alt="Captured"
           />
         )}
         {!pick ? (
-          <button 
-            style={{ position: 'absolute', bottom: -40, left: '50%', transform: 'translateX(-50%)' }} 
-            onClick={capture}
-            className="p-4 border-4 px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 transition-colors"
-          >
-            Capture photo
-          </button>
+
+          <IconButton onClick={capture} sx={{ color: 'white', bgcolor: "#1976d2" }} style={{ position: 'absolute', bottom: -20, left: '50%', transform: 'translateX(-50%)', }}>
+            <CameraAlt />
+          </IconButton>
         ) : (
-          <button 
-            style={{ position: 'absolute', bottom: -40, left: '50%', transform: 'translateX(-50%)' }} 
-            onClick={retake}
-            className="p-4 border-4 px-4 py-2 bg-red-500 text-white rounded hover:bg-red-600 transition-colors"
-          >
-            Tirar novamente
-          </button>
+          <IconButton onClick={retake} sx={{ color: 'white', bgcolor: "#1976d2" }} style={{ position: 'absolute', bottom: -20, left: '50%', transform: 'translateX(-50%)', }}>
+            <RefreshOutlined />
+          </IconButton>
         )}
       </div>
     </div>
