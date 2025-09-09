@@ -1,38 +1,70 @@
 "use client";
 import * as React from "react";
 import Typography from "@mui/material/Typography";
-import { Box, Card, CardHeader, CardMedia } from "@mui/material";
-import { PageContainer } from "@toolpad/core";
+import { Box, Button, Card, CardHeader } from "@mui/material";
+import { PageContainer, useSession } from "@toolpad/core";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
+import WebcamCapture from "@/components/WebcamCapture";
 
-export default function Page() {
-    const [currentTime, setCurrentTime] = React.useState(new Date());
+function CurrentTime() {
+    const [value, setValue] = React.useState<Date | null>(null);
+    const [isLoading, setLoading] = React.useState(true);
 
     React.useEffect(() => {
-        const interval = setInterval(() => {setCurrentTime(new Date())}, 1000);
+        if (!!value) {
+            setLoading(false);
+        }
+        const interval = setInterval(() => {
+            setValue(new Date());
+        }, 1000);
+
         return () => clearInterval(interval);
     }, []);
+
+    return { currentTime: value, isLoading };
+}
+
+export default function Page() {
+    const { currentTime } = CurrentTime();
 
     return (
         <PageContainer>
             <Box sx={{ p: 2 }}>
-                <Typography variant="h4" sx={{ fontWeight: 'bold', textAlign: 'center' }} gutterBottom>{format(currentTime, 'HH:mm:ss')}</Typography>
-                <Typography variant="h6" sx={{ textAlign: 'center' }} gutterBottom>{format(currentTime, "EEEE, dd 'de' MMMM 'de' yyyy", { locale: ptBR })}</Typography>
-                <Card sx={{ p: 2, mb: 2 }}>
-                    <Typography variant="h5" sx={{ fontWeight: 'bold', textAlign: 'center' }}>
-                        Ponto Facil
-                    </Typography>
+                <Typography variant="h4" sx={{ fontWeight: 'bold', textAlign: 'center' }} gutterBottom>
+                    Ponto
+                </Typography>
+                <Card sx={{ p: 2, mb: 2 }} elevation={3}>
                     <CardHeader sx={{ textAlign: 'center' }}
-                        title="FULANINHO DA SILVA"
-                        subheader=""
+                        title={currentTime ? format(currentTime, 'HH:mm:ss') : "--:--:--"}
+                        subheader={currentTime ? format(currentTime, "EEEE, dd'/'MM'/'yyyy", { locale: ptBR }) : "Carregando..."}
                     />
-                    <CardMedia component="img"
-                        height="194"
-                        image="https://www.pngall.com/wp-content/uploads/5/Profile-PNG-High-Quality-Image.png"
-                        alt="Profile Image"
-                        sx={{ width: 150, height: 150, margin: '0 auto', borderRadius: '50%' }}
-                    />
+
+                    <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', my: 2 }}>
+                        <Box sx={{ mt: 1 }}>
+                            <Typography variant="body2" color="textSecondary">
+                                Clique na câmera para tirar uma foto
+                            </Typography>
+                        </Box>
+                        <WebcamCapture />
+                    </Box>
+
+                    <Box sx={{mt:4}}>
+                        <Button fullWidth style={{backgroundColor:"#1976d2", color: 'white'}}>Envia Ponto</Button>
+                    </Box>
+
+                    {false && (<Box sx={{ mt: 2, textAlign: 'center' }}>
+                        <Typography variant="body1">
+                            Matrícula: 123456
+                        </Typography>
+                        <Typography variant="body1">
+                            Cargo: Desenvolvedor
+                        </Typography>
+                        <Typography variant="body1">
+                            Departamento: Tecnologia
+                        </Typography>
+                    </Box>)}
+
                 </Card>
             </Box>
         </PageContainer>

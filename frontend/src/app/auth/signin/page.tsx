@@ -1,7 +1,7 @@
 'use client';
 import * as React from 'react';
 import { SignInPage } from '@toolpad/core/SignInPage';
-import { providerMap } from '../../../auth';
+import { providerMap } from '@/auth';
 import type { AuthProvider } from '@toolpad/core';
 import serverSignIn from './actions';
 
