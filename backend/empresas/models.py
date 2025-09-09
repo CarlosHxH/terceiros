@@ -1,7 +1,7 @@
 # empresas/models.py
 from django.db import models
 from django.core.validators import RegexValidator
-from core.models import Usuario
+from usuarios.models import Usuario
 
 
 class EmpresaTerceirizada(models.Model):
