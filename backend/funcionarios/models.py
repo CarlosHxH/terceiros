@@ -35,8 +35,8 @@ class Cargo(models.Model):
 
 class Funcionario(models.Model):
     """Funcionários das empresas terceirizadas"""
-    usuario = models.OneToOneField('USUARIOS.Usuario', on_delete=models.CASCADE, related_name='funcionario')
-    empresa = models.ForeignKey('EMPRESAS.EmpresaTerceirizada', on_delete=models.PROTECT, related_name='funcionarios')
+    usuario = models.OneToOneField('usuarios.Usuario', on_delete=models.CASCADE, related_name='funcionario')
+    empresa = models.ForeignKey('empresas.EmpresaTerceirizada', on_delete=models.PROTECT, related_name='funcionarios')
     cargo = models.ForeignKey(Cargo, on_delete=models.PROTECT, related_name='funcionarios')
     
     # Dados financeiros
