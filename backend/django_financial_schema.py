@@ -1,8 +1,8 @@
 # =============================================================================
-# APP: CORE (Configurações básicas e usuários)
+# APP: USUARIOS (Configurações básicas e usuários)
 # =============================================================================
 
-# core/models.py
+# usuarios/models.py
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
