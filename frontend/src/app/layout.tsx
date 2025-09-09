@@ -34,7 +34,7 @@ const NAVIGATION: Navigation = [
 ];
 
 const BRANDING = {
-  title: 'Ponto Facil',
+  title: 'Sistema de Ponto',
   logo: <Image width={100} height={100} priority src='/icon.ico' alt="Logo" style={{width:'auto', borderRadius: '50%'}} />,
 };
 

@@ -9,7 +9,7 @@ const videoConstraints = {
   facingMode: "user"
 };
 
-const WebcamCapture = () => {
+const WebcamCapture = ({onCapture}:{onCapture?:(img:string|null)=>void}) => {
   const [pick, setPick] = useState<string | null>(null);
   const webcamRef = useRef<Webcam>(null);
 
@@ -17,11 +17,13 @@ const WebcamCapture = () => {
     const imageSrc = webcamRef.current?.getScreenshot();
     if (imageSrc) {
       setPick(imageSrc);
+      if(onCapture) onCapture(imageSrc)
     }
   };
 
   const retake = () => {
     setPick(null);
+    if(onCapture) onCapture(null)
   };
 
   return (
@@ -75,16 +77,17 @@ const WebcamCapture = () => {
             alt="Captured"
           />
         )}
-        {!pick ? (
 
-          <IconButton onClick={capture} sx={{ color: 'white', bgcolor: "#1976d2" }} style={{ position: 'absolute', bottom: -20, left: '50%', transform: 'translateX(-50%)', }}>
+        {!pick ? (
+          <IconButton onClick={capture} sx={{ color: 'white', bgcolor: "#1976d2" }} style={{ position: 'absolute', bottom: 40, left: '50%', transform: 'translateX(-50%)', }}>
             <CameraAlt />
           </IconButton>
         ) : (
-          <IconButton onClick={retake} sx={{ color: 'white', bgcolor: "#1976d2" }} style={{ position: 'absolute', bottom: -20, left: '50%', transform: 'translateX(-50%)', }}>
+          <IconButton onClick={retake} sx={{ color: 'white', bgcolor: "#1976d2" }} style={{ position: 'absolute', bottom: 40, left: '50%', transform: 'translateX(-50%)', }}>
             <RefreshOutlined />
           </IconButton>
         )}
+
       </div>
     </div>
   );
