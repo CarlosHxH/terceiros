@@ -1,8 +1,8 @@
 # =============================================================================
-# APP: CORE (Configurações básicas e usuários)
+# APP: USUARIOS (Configurações básicas e usuários)
 # =============================================================================
 
-# core/models.py
+# usuarios/models.py
 from django.db import models
 from django.contrib.auth.models import AbstractUser
 from django.core.validators import RegexValidator
@@ -95,7 +95,7 @@ class LocalPrestacao(models.Model):
 # empresas/models.py
 from django.db import models
 from django.core.validators import RegexValidator
-from core.models import Usuario
+from usuarios.models import Usuario
 
 
 class EmpresaTerceirizada(models.Model):
@@ -160,7 +160,7 @@ class Gestor(models.Model):
 # funcionarios/models.py
 from django.db import models
 from django.core.validators import RegexValidator
-from core.models import Usuario
+from usuarios.models import Usuario
 
 
 class Cargo(models.Model):
@@ -297,7 +297,7 @@ class RegistroPrestacao(models.Model):
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
     created_by = models.ForeignKey(
-        'core.Usuario',
+        'usuarios.Usuario',
         on_delete=models.PROTECT,
         related_name='prestacoes_criadas',
         blank=True,
@@ -411,7 +411,7 @@ class HistoricoValidacao(models.Model):
     prestacao = models.ForeignKey(RegistroPrestacao, on_delete=models.CASCADE, related_name='historico_validacoes')
     status_anterior = models.CharField(max_length=15, choices=RegistroPrestacao.STATUS_VALIDACAO_CHOICES)
     status_novo = models.CharField(max_length=15, choices=RegistroPrestacao.STATUS_VALIDACAO_CHOICES)
-    validado_por = models.ForeignKey('core.Usuario', on_delete=models.PROTECT)
+    validado_por = models.ForeignKey('usuarios.Usuario', on_delete=models.PROTECT)
     observacoes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
 
@@ -435,7 +435,7 @@ from django.db import models
 class RelatorioPersonalizado(models.Model):
     """Relatórios personalizados salvos pelos usuários"""
     nome = models.CharField(max_length=200)
-    usuario = models.ForeignKey('core.Usuario', on_delete=models.CASCADE, related_name='relatorios')
+    usuario = models.ForeignKey('usuarios.Usuario', on_delete=models.CASCADE, related_name='relatorios')
     filtros = models.JSONField(help_text="Filtros aplicados ao relatório")
     campos_exibidos = models.JSONField(help_text="Campos a serem exibidos")
     descricao = models.TextField(blank=True)

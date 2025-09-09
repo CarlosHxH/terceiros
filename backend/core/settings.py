@@ -39,7 +39,12 @@ INSTALLED_APPS = [
     'django.contrib.staticfiles',
     'rest_framework',
     'terceiros',
-    
+    'usuarios',
+    'empresas',
+    'funcionarios',
+    'localizacao',
+    'prestacoes',
+    'relatorios',
 ]
 
 MIDDLEWARE = [
@@ -124,5 +129,20 @@ STATIC_URL = 'static/'
 
 DEFAULT_AUTO_FIELD = 'django.db.models.BigAutoField'
 
+# Configuração do modelo de usuário customizado
+AUTH_USER_MODEL = 'usuarios.Usuario'
+
+# Configurações do Django REST Framework
+REST_FRAMEWORK = {
+    'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework.authentication.SessionAuthentication',
+        'rest_framework.authentication.TokenAuthentication',
+    ],
+    'DEFAULT_PERMISSION_CLASSES': [
+        'rest_framework.permissions.IsAuthenticated',
+    ],
+    'DEFAULT_PAGINATION_CLASS': 'rest_framework.pagination.PageNumberPagination',
+    'PAGE_SIZE': 20
+}
 
 CORS_ALLOW_ALL_ORIGINS = True
