@@ -63,7 +63,6 @@ export default function Page() {
                 coords: coord
             }));
         }
-        console.log(session);
     }, [coords, session]);
 
     const onCapture = async (photo: string | null) => {

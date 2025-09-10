@@ -26,9 +26,7 @@ export default function SignIn() {
           title: () => <Typography variant='subtitle1' color='primary' fontWeight={'bold'}>Sistema de Ponto</Typography>,
           subtitle: () => <Typography variant='subtitle2' color='textSecondary'>Por favor faça login para continuar</Typography>,
         }}
-        localeText={{
-          providerSignInTitle: () => `ENTRAR`,
-        }}
+        localeText={{providerSignInTitle: () => `ENTRAR`}}
         providers={providerMap}
         signIn={signIn}
       />
