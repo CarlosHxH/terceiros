@@ -38,7 +38,7 @@ INSTALLED_APPS = [
     'django.contrib.messages',
     'django.contrib.staticfiles',
     'rest_framework',
-    'rest_framework.authtoken',
+    'rest_framework_simplejwt',
     'corsheaders',
     'terceiros',
     'usuarios',
@@ -139,8 +139,8 @@ AUTH_USER_MODEL = 'usuarios.Usuario'
 # Configurações do Django REST Framework
 REST_FRAMEWORK = {
     'DEFAULT_AUTHENTICATION_CLASSES': [
+        'rest_framework_simplejwt.authentication.JWTAuthentication',
         'rest_framework.authentication.SessionAuthentication',
-        'rest_framework.authentication.TokenAuthentication',
     ],
     'DEFAULT_PERMISSION_CLASSES': [
         'rest_framework.permissions.IsAuthenticated',
@@ -150,3 +150,36 @@ REST_FRAMEWORK = {
 }
 
 CORS_ALLOW_ALL_ORIGINS = True
+
+# Configurações do JWT
+from datetime import timedelta
+
+SIMPLE_JWT = {
+    'ACCESS_TOKEN_LIFETIME': timedelta(minutes=60),  # Token de acesso válido por 1 hora
+    'REFRESH_TOKEN_LIFETIME': timedelta(days=7),     # Token de refresh válido por 7 dias
+    'ROTATE_REFRESH_TOKENS': True,                   # Rotaciona refresh tokens
+    'BLACKLIST_AFTER_ROTATION': True,                # Invalida tokens antigos após rotação
+    'UPDATE_LAST_LOGIN': True,                       # Atualiza last_login automaticamente
+    
+    'ALGORITHM': 'HS256',                            # Algoritmo de criptografia
+    'SIGNING_KEY': SECRET_KEY,                       # Chave de assinatura
+    'VERIFYING_KEY': None,                           # Chave de verificação
+    'AUDIENCE': None,
+    'ISSUER': None,
+    
+    'AUTH_HEADER_TYPES': ('Bearer',),               # Tipo de header: "Bearer <token>"
+    'AUTH_HEADER_NAME': 'HTTP_AUTHORIZATION',       # Nome do header
+    'USER_ID_FIELD': 'id',                          # Campo do usuário no token
+    'USER_ID_CLAIM': 'user_id',                     # Claim do user_id no token
+    'USER_AUTHENTICATION_RULE': 'rest_framework_simplejwt.authentication.default_user_authentication_rule',
+    
+    'AUTH_TOKEN_CLASSES': ('rest_framework_simplejwt.tokens.AccessToken',),
+    'TOKEN_TYPE_CLAIM': 'token_type',
+    'TOKEN_USER_CLASS': 'rest_framework_simplejwt.models.TokenUser',
+    
+    'JTI_CLAIM': 'jti',
+    
+    'SLIDING_TOKEN_REFRESH_EXP_CLAIM': 'refresh_exp',
+    'SLIDING_TOKEN_LIFETIME': timedelta(minutes=5),
+    'SLIDING_TOKEN_REFRESH_LIFETIME': timedelta(days=1),
+}

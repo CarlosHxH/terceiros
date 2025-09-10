@@ -1,7 +1,8 @@
 from rest_framework import viewsets, status, permissions
 from rest_framework.decorators import action
 from rest_framework.response import Response
-from rest_framework.authtoken.models import Token
+from rest_framework_simplejwt.tokens import RefreshToken
+from rest_framework_simplejwt.views import TokenObtainPairView
 from django.contrib.auth import authenticate
 from django.contrib.auth.hashers import make_password
 from .models import Usuario
@@ -30,14 +31,15 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     
     def get_permissions(self):
         """Define permissões específicas para cada ação"""
-        if self.action == 'create':
-            # Qualquer um pode criar usuário (registro)
+        # Endpoints públicos (não exigem autenticação)
+        if self.action in ['register', 'login', 'refresh_token', 'create']:
             permission_classes = [permissions.AllowAny]
-        elif self.action in ['list', 'retrieve']:
-            # Apenas usuários autenticados podem listar/ver usuários
-            permission_classes = [permissions.IsAuthenticated]
-        elif self.action in ['update', 'partial_update', 'destroy']:
-            # Apenas o próprio usuário ou staff pode editar/deletar
+        # Demais endpoints exigem autenticação
+        elif self.action in [
+            'list', 'retrieve', 'update', 'partial_update', 'destroy',
+            'me', 'update_me', 'change_password', 'logout',
+            'toggle_active', 'toggle_staff'
+        ]:
             permission_classes = [permissions.IsAuthenticated]
         else:
             permission_classes = [permissions.IsAuthenticated]
@@ -74,11 +76,16 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         serializer = UsuarioCreateSerializer(data=request.data)
         if serializer.is_valid():
             usuario = serializer.save()
-            # Cria token de autenticação
-            token, created = Token.objects.get_or_create(user=usuario)
+            # Cria tokens JWT
+            refresh = RefreshToken.for_user(usuario)
+            access_token = refresh.access_token
+            
             return Response({
                 'usuario': UsuarioSerializer(usuario).data,
-                'token': token.key,
+                'tokens': {
+                    'access': str(access_token),
+                    'refresh': str(refresh)
+                },
                 'message': 'Usuário criado com sucesso!'
             }, status=status.HTTP_201_CREATED)
         return Response(serializer.errors, status=status.HTTP_400_BAD_REQUEST)
@@ -97,10 +104,16 @@ class UsuarioViewSet(viewsets.ModelViewSet):
         
         user = authenticate(username=username, password=password)
         if user and user.is_active:
-            token, created = Token.objects.get_or_create(user=user)
+            # Cria tokens JWT
+            refresh = RefreshToken.for_user(user)
+            access_token = refresh.access_token
+            
             return Response({
                 'usuario': UsuarioSerializer(user).data,
-                'token': token.key,
+                'tokens': {
+                    'access': str(access_token),
+                    'refresh': str(refresh)
+                },
                 'message': 'Login realizado com sucesso!'
             })
         else:
@@ -113,7 +126,8 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     def logout(self, request):
         """Endpoint para logout de usuários"""
         try:
-            request.user.auth_token.delete()
+            # Com JWT, o logout é feito no frontend removendo o token
+            # Aqui podemos adicionar o token à blacklist se necessário
             return Response({'message': 'Logout realizado com sucesso!'})
         except:
             return Response(
@@ -172,3 +186,28 @@ class UsuarioViewSet(viewsets.ModelViewSet):
             'message': f'Usuário {status_text} com sucesso!',
             'is_staff': usuario.is_staff
         })
+    
+    @action(detail=False, methods=['post'], permission_classes=[permissions.AllowAny])
+    def refresh_token(self, request):
+        """Endpoint para renovar access token usando refresh token"""
+        refresh_token = request.data.get('refresh')
+        
+        if not refresh_token:
+            return Response(
+                {'detail': 'Refresh token é obrigatório.'},
+                status=status.HTTP_400_BAD_REQUEST
+            )
+        
+        try:
+            refresh = RefreshToken(refresh_token)
+            access_token = refresh.access_token
+            
+            return Response({
+                'access': str(access_token),
+                'message': 'Token renovado com sucesso!'
+            })
+        except Exception as e:
+            return Response(
+                {'detail': 'Refresh token inválido ou expirado.'},
+                status=status.HTTP_401_UNAUTHORIZED
+            )

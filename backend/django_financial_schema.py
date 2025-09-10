@@ -471,7 +471,7 @@ class RegistroPonto(models.Model):
     """
     foto = models.ImageField(upload_to='pontos/%Y/%m/', help_text="Foto do funcionário no momento do ponto")
     ip = models.CharField(max_length=100, help_text="IP do dispositivo no momento do registro")
-    latitude = models.DecimalField(max_digits=10, decimal_places=8, help_text="Latitude do local do ponto")
+    latitude = models.DecimalField(max_digits=11, decimal_places=8, help_text="Latitude do local do ponto")
     longitude = models.DecimalField(max_digits=11, decimal_places=8, help_text="Longitude do local do ponto")
     funcionario = models.ForeignKey(
         'funcionarios.Funcionario',
