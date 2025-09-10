@@ -27,7 +27,7 @@ export default function SignIn() {
           subtitle: () => <Typography variant='subtitle2' color='textSecondary'>Por favor faça login para continuar</Typography>,
         }}
         localeText={{
-          providerSignInTitle: (provider: string) => `ENTRAR`,
+          providerSignInTitle: () => `ENTRAR`,
         }}
         providers={providerMap}
         signIn={signIn}
