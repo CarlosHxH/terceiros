@@ -7,8 +7,9 @@ import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import WebcamCapture from "@/components/WebcamCapture";
 import LocationTracker from "@/hooks/LocationTracker";
-import geoDistance from 'geo-distance-helper';
 import CurrentTime from "@/hooks/CurrentTime";
+import { useToast } from "@/components/Toast";
+import dataUrlToFile from "@/hooks/dataUrlToFile";
 
 const positions = [
     { lat: -15.6550913, lng: -55.9941522, name: 'Cuiabá' },
@@ -27,40 +28,27 @@ interface FormDataState {
     distances?: DistanceInfo[];
     coords?: { lat: number; lng: number };
     photo?: File | null;
-}
-
-export async function dataUrlToFile(dataUrl: string, fileName: string): Promise<File> {
-    const res: Response = await fetch(dataUrl);
-    const blob: Blob = await res.blob();
-    return new File([blob], fileName, { type: 'image/png' });
+    data?: number;
 }
 
 export default function Page() {
     const session = useSession();
+    const toast = useToast();
     const { currentTime } = CurrentTime();
     const { coords, error } = LocationTracker();
-
     const [formData, setFormData] = useState<FormDataState>({});
-    const [distances, setDistances] = useState<DistanceInfo[]>([]);
+    const [pontos, setPontos] = useState<FormDataState[]>([]);
+    const [open, setOpen] = useState(false);
     const [disabled, setDisabled] = useState(true);
 
     useEffect(() => {
         if (coords) {
             const coord = { lat: coords.latitude, lng: coords.longitude };
-            const calculatedDistances = positions.map((position) => {
-                const distance = geoDistance(coord, position);
-                return {
-                    name: position.name,
-                    distance: distance,
-                    position: position
-                };
-            });
-            setDistances(calculatedDistances);
             setFormData(prev => ({
                 ...prev,
-                userId: session?.user?.id||'',
-                //distances: calculatedDistances,
-                coords: coord
+                userId: session?.user?.id || '',
+                coords: coord,
+                data: Date.now()
             }));
         }
     }, [coords, session]);
@@ -73,7 +61,6 @@ export default function Page() {
 
     const onSubmit = () => {
         const form = new FormData();
-        
         // Add non-blob data as JSON strings
         if (formData.userId) {
             form.append('userId', formData.userId);
@@ -81,49 +68,42 @@ export default function Page() {
         if (formData.coords) {
             form.append('coords', JSON.stringify(formData.coords));
         }
-        
         // Add blob data (photo)
         if (formData.photo instanceof File) {
             form.append('photo', formData.photo, formData.photo.name);
         }
-        /*
-        console.log('FormData entries:');
-        for (const [key, value] of form.entries()) {
-            console.log(key, value);
-        }*/
-        
         console.log('Original formData:', formData);
-        
-    };
-
-    const renderDistances = () => {
-        if (!coords) {
-            return <Typography variant="body2" color="textSecondary">Aguardando localização...</Typography>;
-        }
-
-        if (error) {
-            return <Typography variant="body2" color="error">Erro ao obter localização: {error}</Typography>;
-        }
-        const numeros = Object.values(distances).map(valor => Number(valor.distance))
-        const menorValorMisto = Math.min(...numeros);
-        return (
-            <Typography variant="h6" sx={{ mb: 1 }}>{menorValorMisto}</Typography>
-        );
+        setPontos((prev)=>[...prev, formData])
+        setFormData({})
+        setOpen(false)
+        setDisabled(true)
+        toast.showSuccess('Sucesso ao registrar ponto')
     };
 
     const title = currentTime ? format(currentTime, 'HH:mm:ss') : "--:--:--";
     const subtitle = currentTime ? format(currentTime, "EEEE, dd'/'MM'/'yyyy", { locale: ptBR }) : "Carregando...";
-    
+
     return (
         <PageContainer>
             <Card sx={{ px: 2 }} elevation={3}>
                 <CardHeader sx={{ textAlign: 'center' }} title={title} subheader={subtitle} />
                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', mb: 2, p: 2 }}>
                     <Typography sx={{ mb: 1 }} variant="body2" color="textSecondary">Clique na câmera para tirar uma foto</Typography>
-                    <WebcamCapture onCapture={onCapture} />
+                    {!open?(
+                        <Button onClick={()=>setOpen(true)}>CAPTURAR FACIAL</Button>
+                    ):(
+                        <WebcamCapture onCapture={onCapture} />
+                    )}
                     <Button onClick={onSubmit} sx={{ mt: 1 }} disabled={disabled} variant="contained" fullWidth>Enviar Ponto</Button>
                 </Box>
             </Card>
+            {pontos.map((item,i)=>(
+                <Box key={i}>
+                    {(item?.data)&&<Typography>
+                        {["ENTRADA","SAIDA ALMOÇO","VOLTA ALMOÇO","SAIDA"][i]}: {new Date(item?.data).toLocaleString()}
+                    </Typography>}
+                </Box>
+            ))}
         </PageContainer>
     );
 }

@@ -4,8 +4,8 @@ import React, { useRef, useState } from "react";
 import Webcam from "react-webcam";
 
 const videoConstraints = {
-  width: 300,
-  height: 300,
+  width: 400,
+  height: 400,
   facingMode: "user"
 };
 
@@ -33,8 +33,8 @@ const WebcamCapture = ({onCapture}:{onCapture?:(img:string|null)=>void}) => {
           <>
             <Webcam
               audio={false}
-              height={300}
-              width={300}
+              height={400}
+              width={400}
               screenshotFormat="image/jpeg"
               videoConstraints={videoConstraints}
               ref={webcamRef}
@@ -46,8 +46,8 @@ const WebcamCapture = ({onCapture}:{onCapture?:(img:string|null)=>void}) => {
             />
             <Box
               sx={{
-                width: 300,
-                height: 300,
+                width: 400,
+                height: 400,
                 position: 'absolute',
                 top: 0,
                 left: 0,
@@ -77,7 +77,6 @@ const WebcamCapture = ({onCapture}:{onCapture?:(img:string|null)=>void}) => {
             alt="Captured"
           />
         )}
-
         {!pick ? (
           <IconButton onClick={capture} sx={{ color: 'white', bgcolor: "#1976d2" }} style={{ position: 'absolute', bottom: 40, left: '50%', transform: 'translateX(-50%)', }}>
             <CameraAlt />
@@ -87,7 +86,6 @@ const WebcamCapture = ({onCapture}:{onCapture?:(img:string|null)=>void}) => {
             <RefreshOutlined />
           </IconButton>
         )}
-
       </div>
     </div>
   );

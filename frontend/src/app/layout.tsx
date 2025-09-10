@@ -9,6 +9,7 @@ import { SessionProvider, signIn, signOut } from 'next-auth/react';
 import { auth } from '@/auth';
 import theme from '@/theme';
 import Image from 'next/image';
+import { ToastProvider } from '@/components/Toast';
 
 export const metadata = {
   title: 'Ponto Facil',
@@ -35,7 +36,7 @@ const NAVIGATION: Navigation = [
 
 const BRANDING = {
   title: 'Sistema de Ponto',
-  logo: <Image width={100} height={100} priority src='/icon.ico' alt="Logo" style={{width:'auto', borderRadius: '50%'}} />,
+  logo: <Image width={100} height={100} priority src='/icon.ico' alt="Logo" style={{ width: 'auto', borderRadius: '50%' }} />,
 };
 
 
@@ -53,7 +54,7 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
       <body>
         <SessionProvider session={session}>
           <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-          
+
             <NextAppProvider
               navigation={NAVIGATION}
               branding={BRANDING}
@@ -61,9 +62,11 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
               authentication={AUTHENTICATION}
               theme={theme}
             >
-              {props.children}
+              <ToastProvider maxToasts={5} defaultDuration={5000}>
+                {props.children}
+              </ToastProvider>
             </NextAppProvider>
-            
+
           </AppRouterCacheProvider>
         </SessionProvider>
       </body>
