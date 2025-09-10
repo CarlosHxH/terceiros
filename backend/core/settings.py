@@ -45,6 +45,7 @@ INSTALLED_APPS = [
     'localizacao',
     'prestacoes',
     'relatorios',
+    'ponto',
 ]
 
 MIDDLEWARE = [
