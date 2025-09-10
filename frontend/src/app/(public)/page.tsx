@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Typography from "@mui/material/Typography";
 import { Box, Button, Card, CardHeader } from "@mui/material";
-import { PageContainer } from "@toolpad/core";
+import { PageContainer, useSession } from "@toolpad/core";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import WebcamCapture from "@/components/WebcamCapture";
@@ -18,23 +18,35 @@ const positions = [
 
 interface DistanceInfo {
     name: string;
-    distance: number;
-    position: { lat: number; lng: number, name: string; };
+    distance: Number;
+    position: { lat: number; lng: number; name: string; };
+}
+
+interface FormDataState {
+    userId?: string;
+    distances?: DistanceInfo[];
+    coords?: { lat: number; lng: number };
+    photo?: File | null;
+}
+
+export async function dataUrlToFile(dataUrl: string, fileName: string): Promise<File> {
+    const res: Response = await fetch(dataUrl);
+    const blob: Blob = await res.blob();
+    return new File([blob], fileName, { type: 'image/png' });
 }
 
 export default function Page() {
+    const session = useSession();
     const { currentTime } = CurrentTime();
     const { coords, error } = LocationTracker();
 
-    const [formData, setFormData] = useState({});
+    const [formData, setFormData] = useState<FormDataState>({});
     const [distances, setDistances] = useState<DistanceInfo[]>([]);
-
-    const [ disabled, setDisabled ] = useState(true)
+    const [disabled, setDisabled] = useState(true);
 
     useEffect(() => {
         if (coords) {
             const coord = { lat: coords.latitude, lng: coords.longitude };
-            
             const calculatedDistances = positions.map((position) => {
                 const distance = geoDistance(coord, position);
                 return {
@@ -46,11 +58,44 @@ export default function Page() {
             setDistances(calculatedDistances);
             setFormData(prev => ({
                 ...prev,
-                distances: calculatedDistances,
+                userId: session?.user?.id||'',
+                //distances: calculatedDistances,
                 coords: coord
             }));
         }
-    }, [coords]);
+        console.log(session);
+    }, [coords, session]);
+
+    const onCapture = async (photo: string | null) => {
+        const myBlob = photo ? await dataUrlToFile(photo, Date.now() + ".png") : null;
+        setFormData(prev => ({ ...prev, photo: myBlob }));
+        setDisabled(!photo);
+    };
+
+    const onSubmit = () => {
+        const form = new FormData();
+        
+        // Add non-blob data as JSON strings
+        if (formData.userId) {
+            form.append('userId', formData.userId);
+        }
+        if (formData.coords) {
+            form.append('coords', JSON.stringify(formData.coords));
+        }
+        
+        // Add blob data (photo)
+        if (formData.photo instanceof File) {
+            form.append('photo', formData.photo, formData.photo.name);
+        }
+        /*
+        console.log('FormData entries:');
+        for (const [key, value] of form.entries()) {
+            console.log(key, value);
+        }*/
+        
+        console.log('Original formData:', formData);
+        
+    };
 
     const renderDistances = () => {
         if (!coords) {
@@ -60,48 +105,24 @@ export default function Page() {
         if (error) {
             return <Typography variant="body2" color="error">Erro ao obter localização: {error}</Typography>;
         }
-
+        const numeros = Object.values(distances).map(valor => Number(valor.distance))
+        const menorValorMisto = Math.min(...numeros);
         return (
-            <Box sx={{ mb: 2 }}>
-                <Typography variant="h6" sx={{ mb: 1 }}>Distâncias:</Typography>
-                {distances.map((item, index) => (
-                    <Typography key={index} variant="body2">
-                        {item.name}: {item.distance}
-                    </Typography>
-                ))}
-            </Box>
+            <Typography variant="h6" sx={{ mb: 1 }}>{menorValorMisto}</Typography>
         );
     };
 
+    const title = currentTime ? format(currentTime, 'HH:mm:ss') : "--:--:--";
+    const subtitle = currentTime ? format(currentTime, "EEEE, dd'/'MM'/'yyyy", { locale: ptBR }) : "Carregando...";
+    
     return (
         <PageContainer>
-            {renderDistances()}
-
             <Card sx={{ px: 2 }} elevation={3}>
-                <CardHeader 
-                    sx={{ textAlign: 'center' }}
-                    title={currentTime ? format(currentTime, 'HH:mm:ss') : "--:--:--"}
-                    subheader={currentTime ? format(currentTime, "EEEE, dd'/'MM'/'yyyy", { locale: ptBR }) : "Carregando..."}
-                />
-
-                <Box sx={{ 
-                    display: 'flex', 
-                    justifyContent: 'center', 
-                    alignItems: 'center', 
-                    flexDirection: 'column', 
-                    mb: 2, 
-                    p: 2 
-                }}>
-                    <Typography sx={{ mb: 1 }} variant="body2" color="textSecondary">
-                        Clique na câmera para tirar uma foto
-                    </Typography>
-                    <WebcamCapture onCapture={(photo) => {
-                        setFormData(prev => ({ ...prev, photo }));
-                        setDisabled(!photo);
-                    }} />
-                    <Button sx={{ mt: 1 }} disabled={disabled} variant="contained" fullWidth>
-                        Enviar Ponto
-                    </Button>
+                <CardHeader sx={{ textAlign: 'center' }} title={title} subheader={subtitle} />
+                <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', mb: 2, p: 2 }}>
+                    <Typography sx={{ mb: 1 }} variant="body2" color="textSecondary">Clique na câmera para tirar uma foto</Typography>
+                    <WebcamCapture onCapture={onCapture} />
+                    <Button onClick={onSubmit} sx={{ mt: 1 }} disabled={disabled} variant="contained" fullWidth>Enviar Ponto</Button>
                 </Box>
             </Card>
         </PageContainer>
