@@ -2,6 +2,7 @@ from rest_framework import serializers
 from django.contrib.auth.password_validation import validate_password
 from django.core.exceptions import ValidationError
 from .models import Usuario
+from rest_framework_simplejwt.serializers import TokenObtainPairSerializer
 
 
 class UsuarioSerializer(serializers.ModelSerializer):
@@ -98,3 +99,29 @@ class UsuarioPasswordSerializer(serializers.Serializer):
         if not user.check_password(value):
             raise serializers.ValidationError("Senha atual incorreta.")
         return value
+
+
+class EmailOrUsernameTokenObtainPairSerializer(TokenObtainPairSerializer):
+    """Permite autenticar usando username OU email no endpoint de token."""
+
+    def __init__(self, *args, **kwargs):
+        super().__init__(*args, **kwargs)
+        # Tornar username opcional e adicionar campo email opcional
+        if self.username_field in self.fields:
+            self.fields[self.username_field].required = False
+        self.fields['email'] = serializers.EmailField(required=False)
+
+    def validate(self, attrs):
+        username = attrs.get(self.username_field)
+        email = self.initial_data.get('email')
+
+        # Se email foi enviado e username não, resolve o username pelo email
+        if email and not username:
+            try:
+                user = Usuario.objects.get(email=email)
+                attrs[self.username_field] = getattr(user, self.username_field)
+            except Usuario.DoesNotExist:
+                # Mantém fluxo padrão que resultará em credenciais inválidas
+                attrs[self.username_field] = ''
+
+        return super().validate(attrs)

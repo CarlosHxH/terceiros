@@ -68,10 +68,17 @@ _Permissão: Público (AllowAny)_
 **Fazer login**
 _Permissão: Público (AllowAny)_
 
-**Request:**
+**Request (aceita username OU email):**
 ```json
 {
     "username": "usuario123",
+    "password": "senha123"
+}
+```
+ou
+```json
+{
+    "email": "usuario@email.com",
     "password": "senha123"
 }
 ```
@@ -110,13 +117,20 @@ _Permissão: Público (AllowAny)_
 ```
 
 #### **POST** `/api/auth/token/`
-**Obter tokens (endpoint padrão JWT)**
+**Obter tokens (endpoint JWT customizado: aceita username OU email)**
 _Permissão: Público (AllowAny)_
 
-**Request:**
+**Request (username):**
 ```json
 {
     "username": "usuario123",
+    "password": "senha123"
+}
+```
+**Request (email):**
+```json
+{
+    "email": "usuario@email.com",
     "password": "senha123"
 }
 ```
