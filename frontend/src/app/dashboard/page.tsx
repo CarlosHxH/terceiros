@@ -4,7 +4,7 @@ import Typography from '@mui/material/Typography';
 import { PageContainer } from '@toolpad/core/PageContainer';
 import { redirect } from 'next/navigation';
 import { headers } from 'next/headers';
-import { auth } from '../../auth';
+import { auth } from '../../lib/auth';
 
 export default async function HomePage() {
   const session = await auth();

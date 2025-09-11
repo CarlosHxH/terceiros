@@ -58,6 +58,7 @@ export default function Page() {
         setFormData(prev => ({ ...prev, photo: myBlob }));
         setDisabled(!photo);
     };
+    
 
     const onSubmit = () => {
         const form = new FormData();

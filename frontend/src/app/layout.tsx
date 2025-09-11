@@ -6,8 +6,8 @@ import PersonIcon from '@mui/icons-material/Person';
 
 import type { Navigation } from '@toolpad/core/AppProvider';
 import { SessionProvider, signIn, signOut } from 'next-auth/react';
-import { auth } from '@/auth';
-import theme from '@/theme';
+import { auth } from '@/lib/auth';
+import theme from '@/lib/theme';
 import Image from 'next/image';
 import { ToastProvider } from '@/components/Toast';
 
