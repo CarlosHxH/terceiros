@@ -1,0 +1,10 @@
+[uwsgi]
+
+chdir           = /var/www/terceiros
+module          = core.wsgi
+home            = /var/www/terceiros/venv
+master          = true
+processes       = 10
+socket          = /var/www/terceiros/terceiros.sock
+chmod-socket    = 666
+vacuum          = true
