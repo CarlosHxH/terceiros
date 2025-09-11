@@ -1,15 +1,26 @@
-# 🔐 API de Usuários - Sistema de Autenticação e Permissões
+# 🔐 API de Usuários - JWT e Permissões
 
 ## 📋 Visão Geral
 
-Sistema completo de gerenciamento de usuários com autenticação via token, permissões Django integradas e endpoints RESTful para integração com frontend.
+API de usuários com autenticação via JWT (access/refresh), permissões do Django e endpoints REST para integração com frontend.
 
-## 🚀 Endpoints Disponíveis
+## 🔒 Autenticação e Headers
 
-### **1. Autenticação**
+- **Header para rotas protegidas:**
+```http
+Authorization: Bearer <access_token>
+Content-Type: application/json
+```
+- Para registrar, logar e renovar token não envie Authorization.
 
-#### **POST** `/api/auth/register/`
-**Registrar novo usuário**
+## 🚀 Endpoints
+
+### 1) Autenticação (público, exceto onde indicado)
+
+#### POST `/api/auth/register/`
+Registrar novo usuário (retorna tokens)
+
+Request:
 ```json
 {
     "username": "usuario123",
@@ -22,56 +33,97 @@ Sistema completo de gerenciamento de usuários com autenticação via token, per
     "password_confirm": "senha123"
 }
 ```
-
-**Resposta:**
+Response:
 ```json
 {
-    "usuario": {
-        "id": 1,
-        "username": "usuario123",
-        "email": "usuario@email.com",
-        "first_name": "João",
-        "last_name": "Silva",
-        "cpf": "123.456.789-00",
-        "telefone": "(65) 99999-9999",
-        "is_active": true,
-        "is_staff": false,
-        "date_joined": "2024-01-01T10:00:00Z"
-    },
-    "token": "abc123def456...",
+    "usuario": { /* dados do usuário */ },
+    "tokens": { "access": "...", "refresh": "..." },
     "message": "Usuário criado com sucesso!"
 }
 ```
 
-#### **POST** `/api/auth/login/`
-**Fazer login**
-```json
-{
-    "username": "usuario123",
-    "password": "senha123"
-}
-```
+#### POST `/api/auth/login/`
+Fazer login com username OU email (retorna tokens)
 
-**Resposta:**
+Request (username):
+```json
+{ "username": "usuario123", "password": "senha123" }
+```
+Request (email):
+```json
+{ "email": "usuario@email.com", "password": "senha123" }
+```
+Response:
 ```json
 {
     "usuario": { /* dados do usuário */ },
-    "token": "abc123def456...",
+    "tokens": { "access": "...", "refresh": "..." },
     "message": "Login realizado com sucesso!"
 }
 ```
 
-#### **POST** `/api/auth/logout/`
-**Fazer logout** (requer autenticação)
-- **Headers:** `Authorization: Token abc123def456...`
+#### POST `/api/auth/token/`
+Obter tokens (JWT padrão customizado) – aceita username OU email
 
-### **2. Perfil do Usuário**
+Request (username):
+```json
+{ "username": "usuario123", "password": "senha123" }
+```
+Request (email):
+```json
+{ "email": "usuario@email.com", "password": "senha123" }
+```
+Response:
+```json
+{ "access": "...", "refresh": "..." }
+```
 
-#### **GET** `/api/auth/me/`
-**Obter dados do usuário logado** (requer autenticação)
+#### POST `/api/auth/refresh-token/`
+Renovar access token usando refresh token (custom)
 
-#### **PUT** `/api/auth/me/`
-**Atualizar perfil** (requer autenticação)
+Request:
+```json
+{ "refresh": "<refresh_token>" }
+```
+Response:
+```json
+{ "access": "...", "message": "Token renovado com sucesso!" }
+```
+
+#### POST `/api/auth/token/refresh/`
+Renovar access token (endpoint padrão SimpleJWT)
+
+Request:
+```json
+{ "refresh": "<refresh_token>" }
+```
+Response:
+```json
+{ "access": "..." }
+```
+
+#### POST `/api/auth/token/verify/`
+Verificar se um token é válido (padrão SimpleJWT)
+
+Request:
+```json
+{ "token": "<access_ou_refresh_token>" }
+```
+
+### 2) Perfil do Usuário (protegido)
+
+#### GET `/api/auth/me/`
+Obter dados do usuário logado
+
+Response:
+```json
+{ /* dados do usuário */ }
+```
+
+#### PUT `/api/auth/me/update/`
+Atualizar dados do usuário logado (parcial)
+
+Request (exemplo):
 ```json
 {
     "first_name": "João Atualizado",
@@ -79,153 +131,127 @@ Sistema completo de gerenciamento de usuários com autenticação via token, per
     "telefone": "(65) 88888-8888"
 }
 ```
-
-#### **POST** `/api/auth/change-password/`
-**Alterar senha** (requer autenticação)
+Response:
 ```json
 {
-    "old_password": "senha123",
+    "usuario": { /* dados atualizados */ },
+    "message": "Perfil atualizado com sucesso!"
+}
+```
+
+#### POST `/api/auth/change-password/`
+Alterar senha
+
+Request:
+```json
+{
+    "old_password": "senha_atual",
     "new_password": "novaSenha456",
     "new_password_confirm": "novaSenha456"
 }
 ```
-
-### **3. Gerenciamento de Usuários (CRUD)**
-
-#### **GET** `/api/usuarios/`
-**Listar usuários** (requer autenticação)
-- **Headers:** `Authorization: Token abc123def456...`
-
-#### **GET** `/api/usuarios/{id}/`
-**Obter usuário específico** (requer autenticação)
-
-#### **PUT** `/api/usuarios/{id}/`
-**Atualizar usuário** (próprio usuário ou staff)
-
-#### **DELETE** `/api/usuarios/{id}/`
-**Deletar usuário** (apenas staff)
-
-### **4. Administração (Apenas Staff)**
-
-#### **POST** `/api/usuarios/{id}/toggle_active/`
-**Ativar/Desativar usuário**
-
-#### **POST** `/api/usuarios/{id}/toggle_staff/`
-**Promover/Remover permissões de staff**
-
-## 🔑 Sistema de Permissões
-
-### **Níveis de Acesso:**
-
-1. **Anônimo** (`AllowAny`):
-   - Registrar usuário
-   - Fazer login
-
-2. **Usuário Autenticado** (`IsAuthenticated`):
-   - Ver próprio perfil
-   - Atualizar próprio perfil
-   - Alterar própria senha
-   - Fazer logout
-   - Listar usuários
-
-3. **Staff** (`IsAdminUser`):
-   - Todas as permissões de usuário
-   - Deletar usuários
-   - Ativar/Desativar usuários
-   - Promover/Remover staff
-
-### **Validações Implementadas:**
-
-- ✅ **CPF único** e formato válido
-- ✅ **Email único**
-- ✅ **Username único**
-- ✅ **Validação de senhas** (comprimento, complexidade)
-- ✅ **Confirmação de senha** na criação
-- ✅ **Verificação de senha atual** na alteração
-
-## 🛠️ Integração com Frontend
-
-### **Headers Necessários:**
-```javascript
-const headers = {
-    'Content-Type': 'application/json',
-    'Authorization': 'Token ' + token
-};
+Response:
+```json
+{ "message": "Senha alterada com sucesso!" }
 ```
 
-### **Exemplo de Uso (JavaScript/React):**
+#### POST `/api/auth/logout/`
+Logout (com JWT é frontend-removendo tokens). Endpoint retorna mensagem.
 
-```javascript
-// Registrar usuário
-const registerUser = async (userData) => {
-    const response = await fetch('/api/auth/register/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(userData)
-    });
-    return response.json();
-};
-
-// Fazer login
-const loginUser = async (credentials) => {
-    const response = await fetch('/api/auth/login/', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        body: JSON.stringify(credentials)
-    });
-    return response.json();
-};
-
-// Obter perfil (com token)
-const getProfile = async (token) => {
-    const response = await fetch('/api/auth/me/', {
-        headers: { 'Authorization': `Token ${token}` }
-    });
-    return response.json();
-};
+Response:
+```json
+{ "message": "Logout realizado com sucesso!" }
 ```
 
-## 🔧 Configurações do Django
+### 3) Usuários (CRUD via ViewSet)
 
-### **Modelo de Usuário Customizado:**
-- Estende `AbstractUser`
-- Campos adicionais: `cpf`, `telefone`, `foto`
-- Validações de CPF e email únicos
+Base: `/api/usuarios/`
 
-### **Autenticação:**
-- **Token Authentication** para API
-- **Session Authentication** para admin
-- Tokens automáticos na criação/login
+- GET `/api/usuarios/` – Listar usuários (protegido)
+- GET `/api/usuarios/{id}/` – Detalhar usuário (protegido)
+- POST `/api/usuarios/` – Criar usuário (usa `UsuarioCreateSerializer`) [no código atual está público]
+- PUT `/api/usuarios/{id}/` – Atualizar usuário (protegido)
+- PATCH `/api/usuarios/{id}/` – Atualização parcial (protegido)
+- DELETE `/api/usuarios/{id}/` – Deletar usuário (apenas staff)
 
-### **CORS Configurado:**
-- Permite requisições do frontend
-- Headers necessários para autenticação
+Observação: para registro com emissão de tokens prefira `/api/auth/register/`.
 
-## 📊 Admin Django
+### 4) Administração (apenas staff)
 
-Acesse `/admin/` para gerenciar usuários com interface administrativa:
-- Listagem com filtros e busca
-- Criação/edição de usuários
-- Gerenciamento de permissões
-- Visualização de dados completos
+#### POST `/api/usuarios/{id}/toggle_active/`
+Ativar/Desativar usuário
 
-## 🚨 Códigos de Status HTTP
+Response:
+```json
+{ "message": "Usuário ativado/desativado com sucesso!", "is_active": true }
+```
 
-- **200** - Sucesso
-- **201** - Criado com sucesso
-- **400** - Dados inválidos
-- **401** - Não autenticado
-- **403** - Sem permissão
-- **404** - Usuário não encontrado
+#### POST `/api/usuarios/{id}/toggle_staff/`
+Promover/Remover staff
 
-## ✅ Próximos Passos
+Response:
+```json
+{ "message": "Usuário promovido a staff/removido do staff com sucesso!", "is_staff": true }
+```
 
-1. **Testar todos os endpoints** com Postman/Insomnia
-2. **Integrar com frontend** (Next.js/React)
-3. **Implementar refresh token** (opcional)
-4. **Adicionar validações extras** conforme necessário
-5. **Configurar logs de auditoria** (opcional)
+### 5) Terceiros (CRUD via ViewSet)
+
+Base: `/api/terceiros/` (protegido por JWT)
+
+- GET `/api/terceiros/` – Listar terceiros
+- GET `/api/terceiros/{id}/` – Detalhar terceiro
+- POST `/api/terceiros/` – Criar terceiro
+- PUT `/api/terceiros/{id}/` – Atualizar terceiro
+- PATCH `/api/terceiros/{id}/` – Atualização parcial
+- DELETE `/api/terceiros/{id}/` – Deletar terceiro
+
+Headers:
+```http
+Authorization: Bearer <access_token>
+Content-Type: application/json
+```
+
+Body (exemplo genérico; ver `TerceiroSerializer` para campos reais):
+```json
+{
+    /* campos do terceiro */
+}
+```
+
+### 6) Funcionários (CRUD via ViewSet)
+
+Base: `/api/funcionarios/` (protegido por JWT)
+
+- GET `/api/funcionarios/` – Listar funcionários
+- GET `/api/funcionarios/{id}/` – Detalhar funcionário
+- POST `/api/funcionarios/` – Criar funcionário
+- PUT `/api/funcionarios/{id}/` – Atualizar funcionário
+- PATCH `/api/funcionarios/{id}/` – Atualização parcial
+- DELETE `/api/funcionarios/{id}/` – Deletar funcionário
+
+Headers:
+```http
+Authorization: Bearer <access_token>
+Content-Type: application/json
+```
+
+Body (exemplo genérico; ver `FuncionarioSerializer` para campos reais):
+```json
+{
+    /* campos do funcionário */
+}
+```
+
+## ❗ Erros Comuns
+
+- Enviar `access` em `/auth/refresh-token/` → retornará "token_not_valid". Use o `refresh`.
+- 404 em `/api/auth/loguin/` → rota correta é `/api/auth/login/`.
+
+## 🧭 Dicas de Teste (Postman/Insomnia)
+
+- Nas rotas públicas, deixe Authorization como "No Auth" e envie `Content-Type: application/json`.
+- Nas rotas protegidas, use `Authorization: Bearer <access_token>`.
 
 ---
 
-**🎯 Sistema pronto para integração com frontend!**
+**🎯 Documentação pronta para uso com o backend atual (JWT).**
