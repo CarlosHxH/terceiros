@@ -155,7 +155,7 @@ REST_FRAMEWORK = {
 
 SPECTACULAR_SETTINGS = {
     'TITLE': 'TERCEIROS API',
-    'DESCRIPTION': 'TERCEIROS API',
+    'DESCRIPTION': 'API de terceiros para o sistema de gestão de terceiros',
     'VERSION': '1.0.0',
     'SERVE_INCLUDE_SCHEMA': False,
     # OTHER SETTINGS
