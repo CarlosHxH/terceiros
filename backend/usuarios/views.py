@@ -10,7 +10,8 @@ from .serializers import (
     UsuarioSerializer, 
     UsuarioCreateSerializer, 
     UsuarioUpdateSerializer,
-    UsuarioPasswordSerializer
+    UsuarioPasswordSerializer,
+    EmailOrUsernameTokenObtainPairSerializer
 )
 
 
@@ -58,7 +59,11 @@ class UsuarioViewSet(viewsets.ModelViewSet):
                 {'detail': 'Você não tem permissão para editar este usuário.'},
                 status=status.HTTP_403_FORBIDDEN
             )
-        serializer.save()
+
+
+    
+
+    
     
     def perform_destroy(self, instance):
         """Exclusão de usuário com validações"""
@@ -94,15 +99,27 @@ class UsuarioViewSet(viewsets.ModelViewSet):
     def login(self, request):
         """Endpoint para login de usuários"""
         username = request.data.get('username')
+        email = request.data.get('email')
         password = request.data.get('password')
         
-        if not username or not password:
+        # Aceita username OU email
+        if (not username and not email) or not password:
             return Response(
-                {'detail': 'Username e password são obrigatórios.'},
+                {'detail': 'Envie username ou email e a senha.'},
                 status=status.HTTP_400_BAD_REQUEST
             )
         
-        user = authenticate(username=username, password=password)
+        # Se veio email e não veio username, resolver username pelo email
+        if email and not username:
+            try:
+                user_obj = Usuario.objects.get(email=email)
+                resolved_username = user_obj.username
+            except Usuario.DoesNotExist:
+                resolved_username = None
+        else:
+            resolved_username = username
+
+        user = authenticate(username=resolved_username, password=password) if resolved_username else None
         if user and user.is_active:
             # Cria tokens JWT
             refresh = RefreshToken.for_user(user)
@@ -211,3 +228,8 @@ class UsuarioViewSet(viewsets.ModelViewSet):
                 {'detail': 'Refresh token inválido ou expirado.'},
                 status=status.HTTP_401_UNAUTHORIZED
             )
+
+
+class EmailOrUsernameTokenObtainPairView(TokenObtainPairView):
+    """View para obtenção de tokens que aceita email ou username."""
+    serializer_class = EmailOrUsernameTokenObtainPairSerializer
