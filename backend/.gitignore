@@ -12,3 +12,5 @@ backend/backend/core/templates/
 backend/backend/core/templates/core/
 backend/backend/core/templates/core/index.html
 backend/staticfiles/
+__pycache__/
+*.pyc
