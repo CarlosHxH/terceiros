@@ -14,3 +14,20 @@ backend/backend/core/templates/core/index.html
 backend/staticfiles/
 __pycache__/
 *.pyc
+
+# Ignorar arquivos compilados do Python
+__pycache__/
+*.pyc
+
+# Ignorar ambiente virtual
+venv/
+.env
+
+# Ignorar banco de dados local SQLite
+db.sqlite3
+
+# Ignorar arquivos estáticos coletados
+staticfiles/
+
+# Ignorar arquivos de log
+*.log
