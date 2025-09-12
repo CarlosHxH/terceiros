@@ -1,2 +1,14 @@
 db.sqlite3
 venv/
+backend/backend/db.sqlite3
+backend/backend/venv/
+backend/backend/static/
+backend/backend/media/
+backend/backend/__pycache__/
+backend/backend/core/static/
+backend/backend/core/media/
+backend/backend/core/__pycache__/
+backend/backend/core/templates/
+backend/backend/core/templates/core/
+backend/backend/core/templates/core/index.html
+backend/staticfiles/
