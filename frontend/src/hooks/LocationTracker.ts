@@ -1,14 +1,18 @@
 import { useState, useEffect } from 'react';
 
-function LocationTracker() {
+const LocationTracker = ():{ coords: {
+  lat: number | undefined;
+  lng: number | undefined;
+}, error: string | null } => {
   const [coords, setCoords] = useState<GeolocationCoordinates | null>(null);
-  const [error, setError] = useState<string|null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     if ("geolocation" in navigator) {
       navigator.geolocation.getCurrentPosition(
         (position) => {
-          setCoords(position.coords)},
+          setCoords(position.coords)
+        },
         (err) => {
           setError(err.message);
         },
@@ -18,7 +22,7 @@ function LocationTracker() {
       setError("Geolocation is not supported by your browser.");
     }
   }, []);
-    return { coords, error }
+  return { coords: { lat: coords?.latitude, lng: coords?.longitude }, error }
 }
 
 export default LocationTracker;

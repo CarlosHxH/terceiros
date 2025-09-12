@@ -19,20 +19,8 @@ export const employeesDataSource: DataSource<Employee> = {
     { field: 'id', headerName: 'ID' },
     { field: 'name', headerName: 'Name', width: 140 },
     { field: 'age', headerName: 'Age', type: 'number' },
-    {
-      field: 'joinDate',
-      headerName: 'Join date',
-      type: 'date',
-      valueGetter: (value) => value && new Date(value),
-      width: 140,
-    },
-    {
-      field: 'role',
-      headerName: 'Department',
-      type: 'singleSelect',
-      valueOptions: ['Market', 'Finance', 'Development'],
-      width: 160,
-    },
+    { field: 'joinDate', headerName: 'Join date', type: 'date', valueGetter: (value) => value && new Date(value), width: 140 },
+    { field: 'role', headerName: 'Department', type: 'singleSelect', valueOptions: ['Market', 'Finance', 'Development'], width: 160 },
   ],
   getMany: async ({ paginationModel, filterModel, sortModel }) => {
     const queryParams = new URLSearchParams();

@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getEmployeesStore, setEmployeesStore } from '../../../employeesStore';
+import { getEmployeesStore, setEmployeesStore } from '../../../data/employeesStore';
 import type { Employee } from '../../../data/employees';
 import type { GridFilterModel, GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
 import type { OmitId } from '@toolpad/core/Crud';
