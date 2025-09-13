@@ -1,33 +1,161 @@
+# ===========================================
+# ARQUIVOS DE BANCO DE DADOS
+# ===========================================
 db.sqlite3
-venv/
-backend/backend/db.sqlite3
-backend/backend/venv/
-backend/backend/static/
-backend/backend/media/
-backend/backend/__pycache__/
-backend/backend/core/static/
-backend/backend/core/media/
-backend/backend/core/__pycache__/
-backend/backend/core/templates/
-backend/backend/core/templates/core/
-backend/backend/core/templates/core/index.html
-backend/staticfiles/
-__pycache__/
-*.pyc
+*.sqlite3
+*.db
 
-# Ignorar arquivos compilados do Python
-__pycache__/
-*.pyc
-
-# Ignorar ambiente virtual
+# ===========================================
+# AMBIENTE VIRTUAL E DEPENDÊNCIAS
+# ===========================================
 venv/
+env/
+ENV/
+.venv/
+.env/
+pip-log.txt
+pip-delete-this-directory.txt
+
+# ===========================================
+# ARQUIVOS COMPILADOS DO PYTHON
+# ===========================================
+__pycache__/
+*.py[cod]
+*$py.class
+*.so
+.Python
+build/
+develop-eggs/
+dist/
+downloads/
+eggs/
+.eggs/
+lib/
+lib64/
+parts/
+sdist/
+var/
+wheels/
+*.egg-info/
+.installed.cfg
+*.egg
+
+# ===========================================
+# ARQUIVOS DE CONFIGURAÇÃO E AMBIENTE
+# ===========================================
 .env
+.env.local
+.env.development
+.env.test
+.env.production
+.venv
+settings_local.py
+local_settings.py
 
-# Ignorar banco de dados local SQLite
-db.sqlite3
-
-# Ignorar arquivos estáticos coletados
+# ===========================================
+# ARQUIVOS ESTÁTICOS E MÍDIA
+# ===========================================
 staticfiles/
+static/
+media/
+uploads/
+core/static/
+core/media/
+*/static/
+*/media/
 
-# Ignorar arquivos de log
+# ===========================================
+# ARQUIVOS DE LOG E DEBUG
+# ===========================================
 *.log
+logs/
+debug.log
+error.log
+access.log
+
+# ===========================================
+# ARQUIVOS DE CACHE E TEMPORÁRIOS
+# ===========================================
+.cache/
+.pytest_cache/
+.coverage
+htmlcov/
+.tox/
+.nox/
+.coverage.*
+.cache
+nosetests.xml
+coverage.xml
+*.cover
+.hypothesis/
+
+# ===========================================
+# ARQUIVOS DO SISTEMA OPERACIONAL
+# ===========================================
+.DS_Store
+.DS_Store?
+._*
+.Spotlight-V100
+.Trashes
+ehthumbs.db
+Thumbs.db
+*~
+
+# ===========================================
+# ARQUIVOS DE IDE E EDITORES
+# ===========================================
+.vscode/
+.idea/
+*.swp
+*.swo
+*~
+.project
+.pydevproject
+.settings/
+
+# ===========================================
+# ARQUIVOS DE DEPLOY E SERVIDOR
+# ===========================================
+# Manter arquivos de configuração de deploy comentados
+# terceiros_uwsgi.ini
+# terceiros.conf
+# uwsgi_params
+# DOCKFILE
+
+# ===========================================
+# ARQUIVOS DE BACKUP E TEMPORÁRIOS
+# ===========================================
+*.bak
+*.backup
+*.tmp
+*.temp
+*.orig
+*.rej
+
+# ===========================================
+# ARQUIVOS DE TESTE E DOCUMENTAÇÃO GERADA
+# ===========================================
+.pytest_cache/
+.coverage
+htmlcov/
+docs/_build/
+site/
+
+# ===========================================
+# ARQUIVOS ESPECÍFICOS DO DJANGO
+# ===========================================
+# Arquivos de migração locais (manter apenas as oficiais)
+# */migrations/00*.py
+
+# Arquivos de sessão
+sessions/
+
+# Arquivos de cache do Django
+django_cache/
+
+# ===========================================
+# ARQUIVOS DE CONFIGURAÇÃO DE PRODUÇÃO
+# ===========================================
+# Descomente se não quiser versionar configurações de produção
+# production_settings.py
+# staging_settings.py
