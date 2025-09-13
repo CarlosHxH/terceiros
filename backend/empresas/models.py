@@ -49,6 +49,7 @@ class Gestor(models.Model):
     telefone_corporativo = models.CharField(max_length=15, blank=True)
     ativo = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = 'Gestor'

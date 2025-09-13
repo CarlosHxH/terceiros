@@ -9,3 +9,13 @@ class EmpresaTerceirizadaAdmin(admin.ModelAdmin):
     list_filter = ("ativa",)
     list_per_page = 10
     readonly_fields = ("created_at", "updated_at")
+
+@admin.register(Gestor)
+class GestorAdmin(admin.ModelAdmin):
+    list_display = ("usuario", "empresa", "cargo")
+    search_fields = ("usuario", "empresa", "cargo")
+    list_filter = ("empresa", "cargo")
+    list_per_page = 10
+    readonly_fields = ("created_at", "updated_at")
+
+

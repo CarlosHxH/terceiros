@@ -175,6 +175,7 @@ class HistoricoValidacao(models.Model):
     validado_por = models.ForeignKey('usuarios.Usuario', on_delete=models.PROTECT)
     observacoes = models.TextField(blank=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = 'Histórico de Validação'

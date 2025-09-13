@@ -7,6 +7,8 @@ class Estado(models.Model):
     nome = models.CharField(max_length=100)
     sigla = models.CharField(max_length=2, unique=True)
     ativo = models.BooleanField(default=True)
+    created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = 'Estado'
@@ -24,6 +26,7 @@ class Cidade(models.Model):
     codigo_ibge = models.CharField(max_length=10, unique=True, blank=True, null=True)
     ativa = models.BooleanField(default=True)
     created_at = models.DateTimeField(auto_now_add=True)
+    updated_at = models.DateTimeField(auto_now=True)
 
     class Meta:
         verbose_name = 'Cidade'
