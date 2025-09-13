@@ -159,3 +159,15 @@ django_cache/
 # Descomente se não quiser versionar configurações de produção
 # production_settings.py
 # staging_settings.py
+
+
+
+# Ambiente virtual
+venv/
+
+# Arquivos compilados do Python
+__pycache__/
+*.pyc
+
+# Banco de dados local SQLite
+db.sqlite3
