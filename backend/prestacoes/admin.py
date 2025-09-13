@@ -6,7 +6,7 @@ from .models import RegistroPrestacao, HistoricoValidacao
 class RegistroPrestacaoAdmin(admin.ModelAdmin):
     list_display = ("funcionario", "data", "local_prestacao", "valor", "validacao_gestor", "created_at")
     search_fields = ("funcionario__usuario__first_name", "funcionario__usuario__last_name", "local_prestacao__nome")
-    list_filter = ("data", "validacao_gestor", "validacao_local", "empresa_terceirizada", "created_at")
+    list_filter = ("data", "validacao_gestor", "validacao_local", "funcionario__empresa", "created_at")
     list_per_page = 20
     readonly_fields = ("created_at", "updated_at")
     
