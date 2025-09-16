@@ -24,7 +24,7 @@ Sistema Django REST Framework completo para gestão de terceiros, funcionários 
 - ✅ **Sistema de Permissões** - 3 níveis de acesso
 - ✅ **Validações Completas** - CPF, email, senhas
 - ✅ **API RESTful** - Padrões REST implementados
-- ✅ **Sistema de Ponto Avançado** - Com GPS e foto
+- ✅ **Sistema de Ponto Avançado** - Com GPS
 - ✅ **CORS Configurado** - Pronto para frontend
 - ✅ **Documentação Completa** - Guias para testes
 
@@ -75,7 +75,7 @@ class Usuario(AbstractUser):
         validators=[RegexValidator(r'^\d{3}\.\d{3}\.\d{3}-\d{2}$', 'CPF deve estar no formato XXX.XXX.XXX-XX')]
     )
     telefone = models.CharField(max_length=15, blank=True)
-    foto = models.ImageField(upload_to='usuarios/', blank=True, null=True)
+    # campo de foto removido
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 ```

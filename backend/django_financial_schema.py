@@ -16,7 +16,6 @@ class Usuario(AbstractUser):
         validators=[RegexValidator(r'^\d{3}\.\d{3}\.\d{3}-\d{2}$', 'CPF deve estar no formato XXX.XXX.XXX-XX')]
     )
     telefone = models.CharField(max_length=15, blank=True)
-    foto = models.ImageField(upload_to='usuarios/', blank=True, null=True)
     created_at = models.DateTimeField(auto_now_add=True)
     updated_at = models.DateTimeField(auto_now=True)
 
@@ -350,7 +349,7 @@ class RegistroPrestacao(models.Model):
 
     @property
     def foto(self):
-        return self.funcionario.usuario.foto
+        return None
 
     @property
     def horas_trabalhadas(self):

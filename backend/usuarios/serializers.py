@@ -12,7 +12,7 @@ class UsuarioSerializer(serializers.ModelSerializer):
         model = Usuario
         fields = [
             'id', 'username', 'email', 'first_name', 'last_name', 
-            'cpf', 'telefone', 'foto', 'is_active', 'is_staff',
+            'cpf', 'telefone', 'is_active', 'is_staff',
             'date_joined', 'last_login', 'created_at', 'updated_at'
         ]
         read_only_fields = ['id', 'date_joined', 'last_login', 'created_at', 'updated_at']
@@ -27,7 +27,7 @@ class UsuarioCreateSerializer(serializers.ModelSerializer):
         model = Usuario
         fields = [
             'username', 'email', 'first_name', 'last_name', 
-            'cpf', 'telefone', 'foto', 'password', 'password_confirm'
+            'cpf', 'telefone', 'password', 'password_confirm'
         ]
     
     def validate(self, attrs):
@@ -65,7 +65,7 @@ class UsuarioUpdateSerializer(serializers.ModelSerializer):
         model = Usuario
         fields = [
             'email', 'first_name', 'last_name', 
-            'cpf', 'telefone', 'foto', 'is_active'
+            'cpf', 'telefone', 'is_active'
         ]
     
     def validate_cpf(self, value):

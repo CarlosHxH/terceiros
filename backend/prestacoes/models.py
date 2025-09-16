@@ -111,7 +111,7 @@ class RegistroPrestacao(models.Model):
 
     @property
     def foto(self):
-        return self.funcionario.usuario.foto
+        return None
 
     @property
     def horas_trabalhadas(self):
