@@ -1,3 +1,29 @@
+"""
+API de Relatórios - ViewSets com Django Filter
+
+Este módulo contém todos os ViewSets para a API de relatórios.
+Todos os endpoints requerem autenticação JWT.
+
+AUTENTICAÇÃO:
+- Todos os endpoints requerem token JWT válido
+- Header: Authorization: Bearer <token>
+- Token obtido via: POST /api/usuarios/login/
+
+FILTROS:
+- Django Filter integrado em todos os endpoints
+- Filtros aparecem automaticamente no Swagger UI
+- Suporte a busca e ordenação
+- Documentação completa de cada filtro
+
+ENDPOINTS DISPONÍVEIS:
+- /api/relatorios/funcionarios/ - Funcionários com filtros
+- /api/relatorios/prestacoes/ - Prestações com filtros  
+- /api/relatorios/pontos/ - Registros de ponto com filtros
+- /api/relatorios/dashboard/geral/ - Dashboard geral
+- /api/relatorios/dashboard/graficos/ - Dados para gráficos
+- /api/relatorios/dashboard/financeiro/ - Relatório financeiro
+"""
+
 from django.shortcuts import render
 from rest_framework import viewsets, status, filters
 from rest_framework.decorators import action
@@ -55,7 +81,21 @@ class FuncionarioViewSet(viewsets.ReadOnlyModelViewSet):
 
     @action(detail=False, methods=['get'])
     def estatisticas(self, request):
-        """Estatísticas dos funcionários"""
+        """
+        Estatísticas dos funcionários
+        
+        Retorna estatísticas agregadas dos funcionários baseadas nos filtros aplicados.
+        
+        **Filtros aplicados:**
+        Os mesmos filtros do endpoint principal são aplicados automaticamente.
+        
+        **Resposta:**
+        - total: Total de funcionários
+        - ativos: Funcionários ativos
+        - inativos: Funcionários inativos
+        - por_empresa: Top 10 empresas por quantidade de funcionários
+        - por_cargo: Top 10 cargos por quantidade de funcionários
+        """
         queryset = self.filter_queryset(self.get_queryset())
         
         stats = {
@@ -74,7 +114,32 @@ class FuncionarioViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class PrestacaoViewSet(viewsets.ReadOnlyModelViewSet):
-    """ViewSet para prestações com filtros avançados"""
+    """
+    ViewSet para prestações com filtros avançados
+    
+    Este endpoint permite listar e filtrar prestações de serviços das empresas terceirizadas.
+    
+    **Filtros disponíveis:**
+    - `funcionario_nome`: Busca por nome completo do funcionário
+    - `empresa`: Busca por nome da empresa (busca parcial)
+    - `data_inicio`: Data da prestação a partir de (YYYY-MM-DD)
+    - `data_fim`: Data da prestação até (YYYY-MM-DD)
+    - `validacao_gestor`: Status de validação (pendente, aprovada, rejeitada, em_revisao)
+    - `valor_min`: Valor mínimo da prestação (formato: decimal)
+    - `valor_max`: Valor máximo da prestação (formato: decimal)
+    - `local_prestacao`: Local de prestação (busca parcial)
+    - `cidade`: Cidade do local de prestação (busca parcial)
+    
+    **Busca e Ordenação:**
+    - `search`: Busca em nome do funcionário
+    - `ordering`: Ordenação por data, valor, created_at
+    
+    **Exemplos de uso:**
+    - `/api/relatorios/prestacoes/?funcionario_nome=João&validacao_gestor=aprovada`
+    - `/api/relatorios/prestacoes/?empresa=ABC&data_inicio=2024-01-01&data_fim=2024-01-31`
+    - `/api/relatorios/prestacoes/?valor_min=100.00&valor_max=500.00&validacao_gestor=aprovada`
+    - `/api/relatorios/prestacoes/?local_prestacao=Escritório&cidade=Cuiabá`
+    """
     queryset = RegistroPrestacao.objects.select_related(
         'funcionario__usuario', 'funcionario__empresa', 'local_prestacao'
     )
@@ -107,7 +172,26 @@ class PrestacaoViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class PontoViewSet(viewsets.ReadOnlyModelViewSet):
-    """ViewSet para registros de ponto com filtros avançados"""
+    """
+    ViewSet para registros de ponto com filtros avançados
+    
+    Este endpoint permite listar e filtrar registros de ponto dos funcionários.
+    
+    **Filtros disponíveis:**
+    - `funcionario_nome`: Busca por nome completo do funcionário
+    - `empresa`: Busca por nome da empresa (busca parcial)
+    - `data_inicio`: Data do registro a partir de (YYYY-MM-DDTHH:MM:SS)
+    - `data_fim`: Data do registro até (YYYY-MM-DDTHH:MM:SS)
+    
+    **Busca e Ordenação:**
+    - `search`: Busca em nome do funcionário
+    - `ordering`: Ordenação por created_at
+    
+    **Exemplos de uso:**
+    - `/api/relatorios/pontos/?funcionario_nome=João`
+    - `/api/relatorios/pontos/?empresa=ABC&data_inicio=2024-01-01T00:00:00`
+    - `/api/relatorios/pontos/?data_inicio=2024-01-01T00:00:00&data_fim=2024-01-31T23:59:59`
+    """
     queryset = RegistroPonto.objects.select_related('funcionario__usuario', 'funcionario__empresa')
     serializer_class = PontoSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
@@ -135,11 +219,35 @@ class PontoViewSet(viewsets.ReadOnlyModelViewSet):
 
 
 class DashboardViewSet(viewsets.ViewSet):
-    """ViewSet para dados do dashboard"""
+    """
+    ViewSet para dados do dashboard
+    
+    Este ViewSet fornece dados agregados para dashboards e relatórios.
+    Todos os endpoints requerem autenticação JWT.
+    """
     
     @action(detail=False, methods=['get'])
     def geral(self, request):
-        """Dashboard geral com estatísticas principais"""
+        """
+        Dashboard geral com estatísticas principais
+        
+        Retorna estatísticas gerais do sistema baseadas nos filtros aplicados.
+        
+        **Filtros disponíveis:**
+        - `empresa_id`: ID da empresa (integer)
+        - `data_inicio`: Data início (YYYY-MM-DD)
+        - `data_fim`: Data fim (YYYY-MM-DD)
+        
+        **Resposta:**
+        - funcionarios: Estatísticas de funcionários (ativos, inativos, total)
+        - prestacoes: Estatísticas de prestações (aprovadas, pendentes, total)
+        - financeiro: Dados financeiros (valor total, horas trabalhadas)
+        
+        **Exemplos de uso:**
+        - `/api/relatorios/dashboard/geral/`
+        - `/api/relatorios/dashboard/geral/?empresa_id=1`
+        - `/api/relatorios/dashboard/geral/?data_inicio=2024-01-01&data_fim=2024-12-31`
+        """
         try:
             # Filtros opcionais via query params
             empresa_id = request.query_params.get('empresa_id')
@@ -212,7 +320,26 @@ class DashboardViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=['get'])
     def graficos(self, request):
-        """Dados para gráficos do dashboard"""
+        """
+        Dados para gráficos do dashboard
+        
+        Retorna dados formatados para gráficos e visualizações.
+        
+        **Filtros disponíveis:**
+        - `empresa_id`: ID da empresa (integer)
+        - `periodo`: Período em dias (integer, padrão: 30)
+        
+        **Resposta:**
+        - status_prestacoes: Prestações por status de validação
+        - prestacoes_por_dia: Prestações agrupadas por dia
+        - funcionarios_por_empresa: Funcionários agrupados por empresa
+        - valores_por_empresa: Valores agrupados por empresa
+        
+        **Exemplos de uso:**
+        - `/api/relatorios/dashboard/graficos/`
+        - `/api/relatorios/dashboard/graficos/?empresa_id=1`
+        - `/api/relatorios/dashboard/graficos/?periodo=60`
+        """
         try:
             empresa_id = request.query_params.get('empresa_id')
             periodo = request.query_params.get('periodo', '30')  # dias
@@ -277,7 +404,26 @@ class DashboardViewSet(viewsets.ViewSet):
 
     @action(detail=False, methods=['get'])
     def financeiro(self, request):
-        """Relatório financeiro detalhado"""
+        """
+        Relatório financeiro detalhado
+        
+        Retorna relatório financeiro completo com dados agregados.
+        
+        **Filtros disponíveis:**
+        - `data_inicio`: Data início (YYYY-MM-DD)
+        - `data_fim`: Data fim (YYYY-MM-DD)
+        - `empresa_id`: ID da empresa (integer)
+        
+        **Resposta:**
+        - resumo: Dados agregados (total prestações, valor total, valor médio, horas totais)
+        - por_empresa: Dados agrupados por empresa
+        - por_funcionario: Dados agrupados por funcionário (top 20)
+        
+        **Exemplos de uso:**
+        - `/api/relatorios/dashboard/financeiro/`
+        - `/api/relatorios/dashboard/financeiro/?data_inicio=2024-01-01&data_fim=2024-01-31`
+        - `/api/relatorios/dashboard/financeiro/?empresa_id=1&data_inicio=2024-01-01`
+        """
         try:
             data_inicio = request.query_params.get('data_inicio')
             data_fim = request.query_params.get('data_fim')
