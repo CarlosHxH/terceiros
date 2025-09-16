@@ -11,15 +11,7 @@ import CurrentTime from "@/hooks/CurrentTime";
 import { useToast } from "@/components/Toast";
 import base64ToFile from "@/hooks/base64ToFile";
 import useClientIP from "@/hooks/useClientIP";
-/*
-// Tipo para os dados do ponto
-interface ApiPontoData {
-    ip: string;
-    funcionario: number;
-    latitude: string;
-    longitude: string;
-    foto: File | null;
-}*/
+import { api } from "@/lib/api";
 
 
 export default function Page() {
@@ -116,15 +108,25 @@ export default function Page() {
                 foto: formData.foto.name
             });
 
+            const response = await api<Usuario>({
+                endpoint: "api/pontos",
+                method: "POST",
+                data: form
+            })
+            console.log({response});
+            
+/*
             // Aqui você faria a requisição para sua API
-            // const response = await fetch('/api/pontos', {
-            //     method: 'POST',
-            //     body: form,
-            // });
+            const response = await fetch('http://192.168.134.46:8000/api/pontos', {
+                 method: 'POST',
+                 body: form,
+            });*/
 
-            // if (!response.ok) {
-            //     throw new Error('Erro ao enviar dados');
-            // }
+            if (!response.data) {
+                throw new Error('Erro ao enviar dados');
+            }
+            console.log(response.data);
+            
 
             // Adicionar aos pontos (simulação)
             setPontos(prev => [...prev, { ...formData }]);
