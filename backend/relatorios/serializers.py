@@ -1,24 +1,9 @@
 # relatorios/serializers.py
 from rest_framework import serializers
-from .models import RelatorioPersonalizado
 from funcionarios.models import Funcionario
 from prestacoes.models import RegistroPrestacao
 from ponto.models import RegistroPonto
 from empresas.models import EmpresaTerceirizada
-
-
-class RelatorioPersonalizadoSerializer(serializers.ModelSerializer):
-    filtros_display = serializers.ReadOnlyField(source='get_filtros_display')
-    campos_display = serializers.ReadOnlyField(source='get_campos_display')
-    
-    class Meta:
-        model = RelatorioPersonalizado
-        fields = [
-            'id', 'nome', 'usuario', 'filtros', 'campos_exibidos', 
-            'descricao', 'publico', 'created_at', 'updated_at',
-            'filtros_display', 'campos_display'
-        ]
-        read_only_fields = ['usuario', 'created_at', 'updated_at']
 
 
 class FuncionarioSerializer(serializers.ModelSerializer):

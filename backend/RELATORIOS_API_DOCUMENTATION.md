@@ -4,6 +4,8 @@
 
 Esta documentação descreve a API de relatórios do sistema de terceiros, implementada com **Django Filter** para filtros avançados e endpoints específicos para dashboards. A API oferece dados prontos para uso no frontend, eliminando a necessidade de processamento complexo no cliente.
 
+**⚠️ IMPORTANTE**: Esta app não possui modelos próprios. Ela serve apenas como namespace para endpoints filtrados que consomem dados diretamente dos modelos das outras apps do sistema.
+
 ## 🏗️ **Arquitetura da Solução**
 
 ### **Tecnologias Utilizadas**
@@ -15,11 +17,10 @@ Esta documentação descreve a API de relatórios do sistema de terceiros, imple
 ### **Estrutura dos Endpoints**
 ```
 /api/relatorios/
-├── funcionarios/          # Gestão de funcionários
-├── prestacoes/           # Gestão de prestações
-├── pontos/               # Gestão de registros de ponto
-├── dashboard/            # Dados para dashboards
-└── relatorios/           # Relatórios personalizados
+├── funcionarios/          # Gestão de funcionários (dados de funcionarios.models)
+├── prestacoes/           # Gestão de prestações (dados de prestacoes.models)
+├── pontos/               # Gestão de registros de ponto (dados de ponto.models)
+└── dashboard/            # Dados para dashboards (agregados de todas as apps)
 ```
 
 ---
@@ -846,13 +847,25 @@ export default GraficosDashboard;
 
 ## 📝 **Resumo dos Endpoints**
 
-| Endpoint | Método | Descrição | Filtros Principais |
-|----------|--------|-----------|-------------------|
-| `/api/relatorios/funcionarios/` | GET | Lista funcionários | nome, empresa, cargo, ativo, data_admissao |
-| `/api/relatorios/prestacoes/` | GET | Lista prestações | funcionario_nome, empresa, data, validacao_gestor, valor |
-| `/api/relatorios/pontos/` | GET | Lista registros de ponto | funcionario_nome, empresa, data |
-| `/api/relatorios/dashboard/geral/` | GET | Dashboard geral | empresa_id, data_inicio, data_fim |
-| `/api/relatorios/dashboard/graficos/` | GET | Dados para gráficos | empresa_id, periodo |
-| `/api/relatorios/dashboard/financeiro/` | GET | Relatório financeiro | data_inicio, data_fim, empresa_id |
+| Endpoint | Método | Descrição | Filtros Principais | Fonte dos Dados |
+|----------|--------|-----------|-------------------|-----------------|
+| `/api/relatorios/funcionarios/` | GET | Lista funcionários | nome, empresa, cargo, ativo, data_admissao | `funcionarios.models.Funcionario` |
+| `/api/relatorios/prestacoes/` | GET | Lista prestações | funcionario_nome, empresa, data, validacao_gestor, valor | `prestacoes.models.RegistroPrestacao` |
+| `/api/relatorios/pontos/` | GET | Lista registros de ponto | funcionario_nome, empresa, data | `ponto.models.RegistroPonto` |
+| `/api/relatorios/dashboard/geral/` | GET | Dashboard geral | empresa_id, data_inicio, data_fim | Agregados de todas as apps |
+| `/api/relatorios/dashboard/graficos/` | GET | Dados para gráficos | empresa_id, periodo | Agregados de todas as apps |
+| `/api/relatorios/dashboard/financeiro/` | GET | Relatório financeiro | data_inicio, data_fim, empresa_id | Agregados de todas as apps |
 
 Esta implementação oferece uma solução completa e eficiente para relatórios e dashboards, utilizando Django Filter para facilitar o desenvolvimento e manutenção do código.
+
+
+
+
+📊 Endpoints Finais:
+Endpoint	Fonte dos Dados	Filtros Django Filter
+/api/relatorios/funcionarios/	funcionarios.models.Funcionario	✅ nome, empresa, cargo, ativo, data_admissao, cpf, cidade
+/api/relatorios/prestacoes/	prestacoes.models.RegistroPrestacao	✅ funcionario_nome, empresa, data, validacao_gestor, valor, local
+/api/relatorios/pontos/	ponto.models.RegistroPonto	✅ funcionario_nome, empresa, data
+/api/relatorios/dashboard/geral/	Agregados de todas as apps	✅ empresa_id, data_inicio, data_fim
+/api/relatorios/dashboard/graficos/	Agregados de todas as apps	✅ empresa_id, periodo
+/api/relatorios/dashboard/financeiro/	Agregados de todas as apps	✅ data_inicio, data_fim, empresa_id

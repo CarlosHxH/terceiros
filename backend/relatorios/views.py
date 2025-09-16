@@ -6,15 +6,12 @@ from django_filters.rest_framework import DjangoFilterBackend
 from django.db.models import Q, Count, Sum, Avg
 from django.db.models.functions import TruncMonth, TruncDay
 from datetime import datetime, timedelta
-from .models import RelatorioPersonalizado
 from .serializers import (
-    RelatorioPersonalizadoSerializer, FuncionarioSerializer, 
-    PrestacaoSerializer, PontoSerializer, DashboardSerializer,
-    GraficoSerializer, RelatorioFinanceiroSerializer
+    FuncionarioSerializer, PrestacaoSerializer, PontoSerializer, 
+    DashboardSerializer, GraficoSerializer, RelatorioFinanceiroSerializer
 )
 from .filters import (
-    FuncionarioFilter, PrestacaoFilter, PontoFilter, 
-    RelatorioPersonalizadoFilter
+    FuncionarioFilter, PrestacaoFilter, PontoFilter
 )
 from funcionarios.models import Funcionario
 from prestacoes.models import RegistroPrestacao
@@ -22,27 +19,32 @@ from ponto.models import RegistroPonto
 from empresas.models import EmpresaTerceirizada
 
 
-class RelatorioPersonalizadoView(viewsets.ModelViewSet):
-    """ViewSet para relatórios personalizados"""
-    queryset = RelatorioPersonalizado.objects.all()
-    serializer_class = RelatorioPersonalizadoSerializer
-    filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
-    filterset_class = RelatorioPersonalizadoFilter
-    search_fields = ['nome', 'descricao']
-    ordering_fields = ['nome', 'created_at', 'updated_at']
-    ordering = ['-created_at']
-
-    def get_queryset(self):
-        """Filtrar relatórios por usuário"""
-        return self.queryset.filter(usuario=self.request.user)
-
-    def perform_create(self, serializer):
-        """Associar usuário ao criar relatório"""
-        serializer.save(usuario=self.request.user)
-
-
 class FuncionarioViewSet(viewsets.ReadOnlyModelViewSet):
-    """ViewSet para funcionários com filtros avançados"""
+    """
+    ViewSet para funcionários com filtros avançados
+    
+    Este endpoint permite listar e filtrar funcionários das empresas terceirizadas.
+    
+    **Filtros disponíveis:**
+    - `nome`: Busca por nome completo (primeiro nome ou sobrenome)
+    - `empresa`: Busca por nome da empresa (busca parcial)
+    - `cargo`: Busca por nome do cargo (busca parcial)
+    - `cpf`: Busca por CPF (busca parcial)
+    - `data_admissao_inicio`: Data de admissão a partir de (YYYY-MM-DD)
+    - `data_admissao_fim`: Data de admissão até (YYYY-MM-DD)
+    - `ativo`: Status do funcionário (true/false)
+    - `cidade`: Cidade da empresa (busca parcial)
+    
+    **Busca e Ordenação:**
+    - `search`: Busca em nome, sobrenome e CPF
+    - `ordering`: Ordenação por data_admissao, usuario__first_name, created_at
+    
+    **Exemplos de uso:**
+    - `/api/relatorios/funcionarios/?nome=João&ativo=true`
+    - `/api/relatorios/funcionarios/?empresa=ABC&cargo=Analista`
+    - `/api/relatorios/funcionarios/?data_admissao_inicio=2024-01-01&data_admissao_fim=2024-12-31`
+    - `/api/relatorios/funcionarios/?search=123.456.789-00&ordering=-data_admissao`
+    """
     queryset = Funcionario.objects.select_related('usuario', 'empresa', 'cargo')
     serializer_class = FuncionarioSerializer
     filter_backends = [DjangoFilterBackend, filters.SearchFilter, filters.OrderingFilter]
