@@ -1,3 +1,9 @@
+export const positions = [
+    { lat: -15.6550913, lng: -55.9941522, name: 'Cuiabá' },
+    { lat: -15.6892992, lng: -56.0216036, name: 'Profarma' },
+    { lat: -15.8767226, lng: -52.3248143, name: 'Barra do Garças' },
+];
+
 export const formatPrice = (value: number | string): string => {
     try {
         const num = typeof value === "number" ? value : parseFloat(value);

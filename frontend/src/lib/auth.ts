@@ -1,6 +1,5 @@
 import NextAuth from "next-auth"
-
-import { signIn as signInAPI} from "@/services/auth"
+import { signIn as signInAPI } from "@/services/auth"
 import Credentials from "next-auth/providers/credentials"
 
 export const { handlers, signIn, signOut, auth } = NextAuth({
@@ -9,22 +8,20 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       name: "credentials",
       credentials: {
         email: { label: "Email", type: "email" },
-        password: {label: "Password", type: "password"},
+        password: { label: "Password", type: "password" },
       },
       // @ts-ignore
       async authorize(credentials) {
-        if (!credentials?.email || !credentials?.password) return null 
-
+        if (!credentials?.email || !credentials?.password) return null
         const response = await signInAPI({ email: credentials.email as string, password: credentials.password as string })
         
-        if (!response.data) return null
-
+        if (!response) return null;
         return {
-          id: response.data.user.id,
-          name: response.data.user.name,
-          email: response.data.user.email,
-          access_token: response.data.access_token, 
-        } 
+          id: response.data?.usuario.id,
+          name: response.data?.usuario.first_name,
+          email: response.data?.usuario.email,
+          access_token: response.data?.tokens.access,
+        }
       }
     })
   ],
@@ -48,5 +45,18 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
       }
       return session
     }
-  }
+  },
+  secret: process.env.NEXTAUTH_SECRET,
+  debug: process.env.NODE_ENV === "development",
+  logger: {
+    error(code, ...message) {
+      //log.error(code, message)
+    },
+    warn(code, ...message) {
+      //log.warn(code, message)
+    },
+    debug(code, ...message) {
+      //log.debug(code, message)
+    },
+  },
 })

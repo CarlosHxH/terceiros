@@ -1,7 +1,6 @@
 'use client';
 import * as React from 'react';
 import { SignInPage } from '@toolpad/core/SignInPage';
-import { providerMap } from '@/lib/auth';
 import { AppProvider, type AuthProvider } from '@toolpad/core';
 import serverSignIn from './actions';
 import { Typography } from '@mui/material';
@@ -27,7 +26,7 @@ export default function SignIn() {
           subtitle: () => <Typography variant='subtitle2' color='textSecondary'>Por favor faça login para continuar</Typography>,
         }}
         localeText={{providerSignInTitle: () => `ENTRAR`}}
-        providers={providerMap}
+        providers={[{id:'credentials', name: 'Credentials'}]}
         signIn={signIn}
       />
     </AppProvider>

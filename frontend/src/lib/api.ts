@@ -10,13 +10,14 @@ type Props = {
     withAuth?: boolean
 }
 
-const BASE_URL = process.env.API_URL + "/api/auth/login/";
+const BASE_URL = process.env.API_URL;
 
 export const api = async <TypeResponse>({ endpoint, method = "GET", data, withAuth = true }: Props): Promise<API<TypeResponse>> => {
     const session = await auth()
     
     const instance = axios.create({
-        baseURL: BASE_URL
+        baseURL: BASE_URL,
+        timeout: 1000,
     })
 
     if (withAuth && session?.user.access_token) {
@@ -24,13 +25,16 @@ export const api = async <TypeResponse>({ endpoint, method = "GET", data, withAu
     }
 
     try {
-        const request = await instance<API<TypeResponse>>(endpoint, {
+        const request = await instance(endpoint, {
             method,
             params: method == "GET" && data,
             data: method != "GET" && data
         })
 
-        return request.data
+        return {
+            success: true,
+            data: request.data,
+        };
     } catch (error) {
         const e = error as AxiosError<APIError>
 

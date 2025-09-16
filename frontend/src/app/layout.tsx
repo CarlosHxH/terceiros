@@ -54,19 +54,9 @@ export default async function RootLayout(props: { children: React.ReactNode }) {
       <body>
         <SessionProvider session={session}>
           <AppRouterCacheProvider options={{ enableCssLayer: true }}>
-
-            <NextAppProvider
-              navigation={NAVIGATION}
-              branding={BRANDING}
-              session={session}
-              authentication={AUTHENTICATION}
-              theme={theme}
-            >
-              <ToastProvider maxToasts={5} defaultDuration={5000}>
-                {props.children}
-              </ToastProvider>
-            </NextAppProvider>
-
+            <ToastProvider maxToasts={5} defaultDuration={5000}>
+              {props.children}
+            </ToastProvider>
           </AppRouterCacheProvider>
         </SessionProvider>
       </body>

@@ -1,3 +1,11 @@
+type ApiPontoData = {
+    ip: string,
+    foto: File | null,
+    latitude: string,
+    longitude: string,
+    funcionario: number
+}
+
 type ApiPontoRequest = {
     userId: string;
     access_token: string
