@@ -14,17 +14,17 @@ const BASE_URL = process.env.API_URL;
 
 export const api = async <TypeResponse>({ endpoint, method = "GET", data, withAuth = true }: Props): Promise<API<TypeResponse>> => {
     const session = await auth()
-    
+
     // Log da configuração inicial
-    console.log('API Configuration:', {
+    /*console.log('API Configuration:', {
         baseURL: BASE_URL,
         endpoint,
         method,
         withAuth,
         hasSession: !!session,
         hasAccessToken: !!session?.user?.access_token
-    });
-    
+    });*/
+
     const instance = axios.create({
         baseURL: BASE_URL,
         timeout: 30000, // Aumentado para 30 segundos
@@ -35,19 +35,18 @@ export const api = async <TypeResponse>({ endpoint, method = "GET", data, withAu
     }
 
     // Log dos headers
-    console.log('Request headers:', instance.defaults.headers);
+    //console.log('Request headers:', instance.defaults.headers);
 
     try {
-        console.log('Making request to:', `${BASE_URL}${endpoint}`);
-        console.log('Request method:', method);
-        
+        //console.log('Making request to:', `${BASE_URL}${endpoint}`);
+        //console.log('Request method:', method);
+
         // Para FormData, não faça log do data completo (pode ser muito grande)
         if (data instanceof FormData) {
             console.log('Request data: FormData with entries:');
             for (let [key, value] of data.entries()) {
-                // Verificar se é um arquivo baseado nas propriedades, não no instanceof File
-                if (typeof value === 'object' && value && 'name' in value && 'size' in value) {
-                    console.log(`  ${key}: File(${(value as any).name}, ${(value as any).size} bytes)`);
+                if (value instanceof File) {
+                    console.log(`  ${key}: File(${value.name}, ${value.size} bytes)`);
                 } else {
                     console.log(`  ${key}:`, value);
                 }
@@ -55,18 +54,18 @@ export const api = async <TypeResponse>({ endpoint, method = "GET", data, withAu
         } else {
             console.log('Request data:', data);
         }
-        
+
         const request = await instance(endpoint, {
             method,
             params: method == "GET" && data,
             data: method != "GET" && data
         })
 
-        console.log('Request successful:', {
+        /*console.log('Request successful:', {
             status: request.status,
             statusText: request.statusText,
             headers: request.headers
-        });
+        });*/
 
         return {
             success: true,
@@ -74,7 +73,7 @@ export const api = async <TypeResponse>({ endpoint, method = "GET", data, withAu
         };
     } catch (error) {
         console.error('Request failed:', error);
-        
+
         const e = error as AxiosError<APIError>
         
         // Log detalhado do erro
@@ -86,6 +85,7 @@ export const api = async <TypeResponse>({ endpoint, method = "GET", data, withAu
             data: e.response?.data,
             headers: e.response?.headers
         });
+        
 
         // Verificar se é erro de rede, timeout, etc.
         if (!e.response) {
