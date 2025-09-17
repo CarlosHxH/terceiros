@@ -11,7 +11,7 @@ import CurrentTime from "@/hooks/CurrentTime";
 import { useToast } from "@/components/Toast";
 import base64ToFile from "@/hooks/base64ToFile";
 import useClientIP from "@/hooks/useClientIP";
-import { api } from "@/lib/api";
+import { sendPonto } from "@/services/ponto";
 
 
 export default function Page() {
@@ -20,7 +20,7 @@ export default function Page() {
     const { currentTime } = CurrentTime();
     const { coords } = LocationTracker();
     const { ip, loading: ipLoading } = useClientIP();
-    
+
     const [pontos, setPontos] = useState<ApiPontoData[]>([]);
     const [open, setOpen] = useState(false);
     const [disabled, setDisabled] = useState(true);
@@ -34,28 +34,28 @@ export default function Page() {
 
     // Atualizar formData quando coordenadas, sessão ou IP mudarem
     useEffect(() => {
-        console.log({coords});
-        
+        console.log({ coords });
+
         if (!coords || !session?.user?.id || !ip) return;
-        
+
         setFormData(prev => ({
             ...prev,
-            funcionario: Number(session.user?.id||0),
+            funcionario: Number(session.user?.id || 0),
             latitude: coords.latitude.toString(),
             longitude: coords.longitude.toString(),
             ip: ip
         }));
     }, [coords, session?.user?.id, ip]);
 
-    const onCapture = async (foto: string|null) => {
+    const onCapture = async (foto: string | null) => {
         if (foto) {
             try {
                 const photo = await base64ToFile(foto, `photo_${Date.now()}.png`);
-                
+
                 if (photo instanceof File) {
-                    setFormData(prev => ({ 
-                        ...prev, 
-                        foto: photo 
+                    setFormData(prev => ({
+                        ...prev,
+                        foto: photo
                     }));
                     setDisabled(false); // Ativar botão Enviar quando a foto for capturada
                 } else {
@@ -100,6 +100,8 @@ export default function Page() {
             form.append('ip', formData.ip);
             form.append('foto', formData.foto, formData.foto.name);
 
+            console.log('Formulario: ',form);
+
             console.log('Dados a serem enviados:', {
                 funcionario: formData.funcionario,
                 latitude: formData.latitude,
@@ -108,25 +110,15 @@ export default function Page() {
                 foto: formData.foto.name
             });
 
-            const response = await api<Usuario>({
-                endpoint: "api/pontos",
-                method: "POST",
-                data: form
-            })
-            console.log({response});
+            const response = sendPonto(form);
+            console.log((await response).data);
             
-/*
-            // Aqui você faria a requisição para sua API
-            const response = await fetch('http://192.168.134.46:8000/api/pontos', {
-                 method: 'POST',
-                 body: form,
-            });*/
 
-            if (!response.data) {
+            if (!(await response).data) {
                 throw new Error('Erro ao enviar dados');
             }
-            console.log(response.data);
-            
+
+            console.log((await response).data);
 
             // Adicionar aos pontos (simulação)
             setPontos(prev => [...prev, { ...formData }]);
@@ -141,7 +133,7 @@ export default function Page() {
 
             toast.showSuccess?.('Ponto registrado com sucesso!');
 
-        } catch (error) {
+        } catch (error) {            
             console.error('Erro ao enviar ponto:', error);
             toast.showError?.('Erro ao registrar ponto. Tente novamente.');
         }
@@ -149,7 +141,7 @@ export default function Page() {
 
     // Verificar se todos os dados necessários estão carregados
     const isDataReady = coords && ip && !ipLoading && session?.user?.id;
-   
+
     const title = currentTime ? format(currentTime, 'HH:mm:ss') : "--:--:--";
     const subtitle = currentTime ? format(currentTime, "EEEE, dd'/'MM'/'yyyy", { locale: ptBR }) : "Carregando...";
 
@@ -158,7 +150,7 @@ export default function Page() {
             <Card sx={{ px: 2 }} elevation={3}>
                 <CardHeader sx={{ textAlign: 'center' }} title={title} subheader={subtitle} />
                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', mb: 2, p: 2 }}>
-                    
+
                     {/* Status dos dados necessários */}
                     <Box sx={{ mb: 2, textAlign: 'center' }}>
                         <Typography
@@ -189,9 +181,9 @@ export default function Page() {
                     </Typography>
 
                     {!open ? (
-                        <Button 
-                            onClick={() => setOpen(true)} 
-                            variant="outlined" 
+                        <Button
+                            onClick={() => setOpen(true)}
+                            variant="outlined"
                             sx={{ mb: 2 }}
                             disabled={!isDataReady}
                         >
