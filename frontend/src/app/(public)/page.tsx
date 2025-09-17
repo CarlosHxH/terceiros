@@ -224,24 +224,6 @@ export default function Page() {
                     >
                         {!isDataReady ? 'Carregando dados...' : 'Enviar Ponto'}
                     </Button>
-
-                    {/* Debug info (remova em produção) */}
-                    {process.env.NODE_ENV === 'development' && (
-                        <Box sx={{ mt: 2, p: 1, bgcolor: 'grey.100', borderRadius: 1, fontSize: '0.75rem' }}>
-                            <Typography variant="caption" sx={{ display: 'block' }}>
-                                Debug Info:
-                            </Typography>
-                            <Typography variant="caption" sx={{ display: 'block' }}>
-                                IP: {ip || 'Carregando...'}
-                            </Typography>
-                            <Typography variant="caption" sx={{ display: 'block' }}>
-                                Coords: {coords ? `${coords.latitude}, ${coords.longitude}` : 'Carregando...'}
-                            </Typography>
-                            <Typography variant="caption" sx={{ display: 'block' }}>
-                                User ID: {session?.user?.id || 'Não logado'}
-                            </Typography>
-                        </Box>
-                    )}
                 </Box>
             </Card>
         </PageContainer>

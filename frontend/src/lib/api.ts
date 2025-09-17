@@ -14,7 +14,7 @@ const BASE_URL = process.env.API_URL;
 
 export const api = async <TypeResponse>({ endpoint, method = "GET", data, withAuth = true }: Props): Promise<API<TypeResponse>> => {
     const session = await auth()
-    
+
     // Log da configuração inicial
     console.log('API Configuration:', {
         baseURL: BASE_URL,
@@ -24,7 +24,7 @@ export const api = async <TypeResponse>({ endpoint, method = "GET", data, withAu
         hasSession: !!session,
         hasAccessToken: !!session?.user?.access_token
     });
-    
+
     const instance = axios.create({
         baseURL: BASE_URL,
         timeout: 30000, // Aumentado para 30 segundos
@@ -40,7 +40,7 @@ export const api = async <TypeResponse>({ endpoint, method = "GET", data, withAu
     try {
         console.log('Making request to:', `${BASE_URL}${endpoint}`);
         console.log('Request method:', method);
-        
+
         // Para FormData, não faça log do data completo (pode ser muito grande)
         if (data instanceof FormData) {
             console.log('Request data: FormData with entries:');
@@ -54,7 +54,7 @@ export const api = async <TypeResponse>({ endpoint, method = "GET", data, withAu
         } else {
             console.log('Request data:', data);
         }
-        
+
         const request = await instance(endpoint, {
             method,
             params: method == "GET" && data,
@@ -73,7 +73,7 @@ export const api = async <TypeResponse>({ endpoint, method = "GET", data, withAu
         };
     } catch (error) {
         //console.error('Request failed:', error);
-        
+
         const e = error as AxiosError<APIError>
         /*
         // Log detalhado do erro
