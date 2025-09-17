@@ -21,10 +21,10 @@ export default function Page() {
     const { coords } = LocationTracker();
     const { ip, loading: ipLoading } = useClientIP();
 
-    const [pontos, setPontos] = useState<ApiPontoData[]>([]);
+    const [pontos, setPontos] = useState<ApiPontoRequest[]>([]);
     const [open, setOpen] = useState(false);
     const [disabled, setDisabled] = useState(true);
-    const [formData, setFormData] = useState<ApiPontoData>({
+    const [formData, setFormData] = useState<ApiPontoRequest>({
         ip: '',
         funcionario: 0,
         latitude: '',
@@ -34,8 +34,6 @@ export default function Page() {
 
     // Atualizar formData quando coordenadas, sessão ou IP mudarem
     useEffect(() => {
-        console.log({ coords });
-
         if (!coords || !session?.user?.id || !ip) return;
 
         setFormData(prev => ({
@@ -100,25 +98,36 @@ export default function Page() {
             form.append('ip', formData.ip);
             form.append('foto', formData.foto, formData.foto.name);
 
-            console.log('Formulario: ',form);
-
             console.log('Dados a serem enviados:', {
                 funcionario: formData.funcionario,
                 latitude: formData.latitude,
                 longitude: formData.longitude,
                 ip: formData.ip,
-                foto: formData.foto.name
+                foto: formData.foto.name,
+                fotoSize: formData.foto.size
             });
 
-            const response = sendPonto(form);
-            console.log((await response).data);
-            
-
-            if (!(await response).data) {
-                throw new Error('Erro ao enviar dados');
+            // Log do FormData para debug
+            console.log('FormData entries:');
+            for (let [key, value] of form.entries()) {
+                console.log(key, value);
             }
 
-            console.log((await response).data);
+            // Aguardar a resposta apenas uma vez
+            const response = await sendPonto(form);
+            console.log('Response completa:', response);
+
+            // Verificar se a resposta foi bem-sucedida
+            if (!response.success) {
+                console.error('API Error Details:', {
+                    detail: response.detail,
+                    code: response.code,
+                    data: response.data
+                });
+                throw new Error(response.detail || 'Erro ao enviar dados');
+            }
+
+            console.log('Data received:', response.data);
 
             // Adicionar aos pontos (simulação)
             setPontos(prev => [...prev, { ...formData }]);
@@ -133,9 +142,17 @@ export default function Page() {
 
             toast.showSuccess?.('Ponto registrado com sucesso!');
 
-        } catch (error) {            
-            console.error('Erro ao enviar ponto:', error);
-            toast.showError?.('Erro ao registrar ponto. Tente novamente.');
+        } catch (error) {
+            console.error('Erro completo ao enviar ponto:', error);
+
+            // Log mais detalhado do erro
+            if (error instanceof Error) {
+                console.error('Error message:', error.message);
+                console.error('Error stack:', error.stack);
+            }
+
+            const errorMessage = error instanceof Error ? error.message : 'Erro desconhecido';
+            toast.showError?.(`Erro ao registrar ponto: ${errorMessage}`);
         }
     };
 

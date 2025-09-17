@@ -16,6 +16,8 @@ export const { handlers, signIn, signOut, auth } = NextAuth({
         const response = await signInAPI({ email: credentials.email as string, password: credentials.password as string })
         
         if (!response) return null;
+        console.log("Sucesso ao fazer login!");
+        
         return {
           id: response.data?.usuario.id,
           name: response.data?.usuario.first_name,

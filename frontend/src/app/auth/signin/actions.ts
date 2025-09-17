@@ -10,8 +10,9 @@ export default async function serverSignIn(provider: AuthProvider, formData: For
       redirectTo: callbackUrl ?? '/',
     });
   } catch (error) {
+    console.log(error);
+    
     if (error instanceof Error && error.message === 'NEXT_REDIRECT') {
-                
       throw error;
     }
     if (error instanceof AuthError) {

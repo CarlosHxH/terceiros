@@ -1778,6 +1778,11 @@ dunder-proto@^1.0.0, dunder-proto@^1.0.1:
     es-errors "^1.3.0"
     gopd "^1.2.0"
 
+edge-csrf@^2.0.0-rc7:
+  version "2.0.0-rc7"
+  resolved "https://registry.yarnpkg.com/edge-csrf/-/edge-csrf-2.0.0-rc7.tgz#9928f4ca832cd78bf775ddaadd798a5505dc0e6d"
+  integrity sha512-9+r9jnWStACk8sHUFGyCJtPLgUPah+cWeaT5kHGjVqCrcRmlgm5xPDhckwoYoqonJMAgQtieuNEC5e5H56vteQ==
+
 emoji-regex@^9.2.2:
   version "9.2.2"
   resolved "https://registry.npmjs.org/emoji-regex/-/emoji-regex-9.2.2.tgz"
