@@ -2,7 +2,7 @@
 import React, { useState, useEffect } from "react";
 import Typography from "@mui/material/Typography";
 import { Box, Button, Card, CardHeader } from "@mui/material";
-import { PageContainer, useSession } from "@toolpad/core";
+import { useSession } from "@toolpad/core";
 import { format } from 'date-fns';
 import { ptBR } from 'date-fns/locale';
 import WebcamCapture from "@/components/WebcamCapture";
@@ -51,11 +51,8 @@ export default function Page() {
                 const photo = await base64ToFile(foto, `photo_${Date.now()}.png`);
 
                 if (photo instanceof File) {
-                    setFormData(prev => ({
-                        ...prev,
-                        foto: photo
-                    }));
-                    setDisabled(false); // Ativar botão Enviar quando a foto for capturada
+                    setFormData(prev => ({ ...prev, foto: photo }));
+                    setDisabled(false);
                 } else {
                     toast.showError?.('Erro ao processar a foto');
                 }
@@ -133,10 +130,7 @@ export default function Page() {
             setPontos(prev => [...prev, { ...formData }]);
 
             // Reset do formulário
-            setFormData(prev => ({
-                ...prev,
-                foto: null,
-            }));
+            setFormData(prev => ({...prev, foto: null }));
             setOpen(false);
             setDisabled(true);
 
@@ -157,39 +151,20 @@ export default function Page() {
     };
 
     // Verificar se todos os dados necessários estão carregados
-    const isDataReady = coords && ip && !ipLoading && session?.user?.id;
+    const isDataReady = coords && session?.user?.id;
 
     const title = currentTime ? format(currentTime, 'HH:mm:ss') : "--:--:--";
     const subtitle = currentTime ? format(currentTime, "EEEE, dd'/'MM'/'yyyy", { locale: ptBR }) : "Carregando...";
 
     return (
-        <PageContainer>
             <Card sx={{ px: 2 }} elevation={3}>
                 <CardHeader sx={{ textAlign: 'center' }} title={title} subheader={subtitle} />
                 <Box sx={{ display: 'flex', justifyContent: 'center', alignItems: 'center', flexDirection: 'column', mb: 2, p: 2 }}>
 
                     {/* Status dos dados necessários */}
                     <Box sx={{ mb: 2, textAlign: 'center' }}>
-                        <Typography
-                            variant="caption"
-                            color={coords ? "success.main" : "warning.main"}
-                            sx={{ display: 'block' }}
-                        >
+                        <Typography variant="caption" color={coords ? "success.main" : "warning.main"} sx={{ display: 'block' }}>
                             {coords ? "✓ Localização obtida" : "⏳ Obtendo localização..."}
-                        </Typography>
-                        <Typography
-                            variant="caption"
-                            color={ip && !ipLoading ? "success.main" : "warning.main"}
-                            sx={{ display: 'block' }}
-                        >
-                            {ip && !ipLoading ? `✓ IP obtido: ${ip}` : "⏳ Obtendo IP..."}
-                        </Typography>
-                        <Typography
-                            variant="caption"
-                            color={session?.user?.id ? "success.main" : "warning.main"}
-                            sx={{ display: 'block' }}
-                        >
-                            {session?.user?.id ? "✓ Usuário identificado" : "⏳ Carregando usuário..."}
                         </Typography>
                     </Box>
 
@@ -198,12 +173,7 @@ export default function Page() {
                     </Typography>
 
                     {!open ? (
-                        <Button
-                            onClick={() => setOpen(true)}
-                            variant="outlined"
-                            sx={{ mb: 2 }}
-                            disabled={!isDataReady}
-                        >
+                        <Button onClick={() => setOpen(true)} variant="outlined" sx={{ mb: 2 }} disabled={!isDataReady}>
                             CAPTURAR FACIAL
                         </Button>
                     ) : (
@@ -215,17 +185,10 @@ export default function Page() {
                         </Box>
                     )}
 
-                    <Button
-                        onClick={onSubmit}
-                        disabled={disabled || !isDataReady}
-                        variant="contained"
-                        fullWidth
-                        sx={{ mt: 1 }}
-                    >
+                    <Button onClick={onSubmit} disabled={disabled || !isDataReady} variant="contained" fullWidth sx={{ mt: 1 }}>
                         {!isDataReady ? 'Carregando dados...' : 'Enviar Ponto'}
                     </Button>
                 </Box>
             </Card>
-        </PageContainer>
     );
 }

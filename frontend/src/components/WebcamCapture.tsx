@@ -70,8 +70,8 @@ const WebcamCapture = ({onCapture}:{onCapture?:(img:string|null)=>void}) => {
               borderRadius: '50%',
               cursor: 'pointer',
               transform: 'scaleX(-1)',
-              width: 300,
-              height: 300,
+              width: 400,
+              height: 400,
               objectFit: 'cover'
             }}
             alt="Captured"

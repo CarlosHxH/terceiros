@@ -1,6 +1,6 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { getEmployeesStore, setEmployeesStore } from '../../../data/employeesStore';
-import type { Employee } from '../../../data/employees';
+import { getEmployeesStore, setEmployeesStore } from '@/data/employeesStore';
+import type { Employee } from '@/data/employees';
 import type { GridFilterModel, GridPaginationModel, GridSortModel } from '@mui/x-data-grid';
 import type { OmitId } from '@toolpad/core/Crud';
 
@@ -31,20 +31,13 @@ export async function GET(req: NextRequest) {
         const employeeValue = employee[field];
 
         switch (operator) {
-          case 'contains':
-            return String(employeeValue).toLowerCase().includes(String(value).toLowerCase());
-          case 'equals':
-            return employeeValue === value;
-          case 'startsWith':
-            return String(employeeValue).toLowerCase().startsWith(String(value).toLowerCase());
-          case 'endsWith':
-            return String(employeeValue).toLowerCase().endsWith(String(value).toLowerCase());
-          case '>':
-            return (employeeValue as number) > value;
-          case '<':
-            return (employeeValue as number) < value;
-          default:
-            return true;
+          case 'contains': return String(employeeValue).toLowerCase().includes(String(value).toLowerCase());
+          case 'equals': return employeeValue === value;
+          case 'startsWith': return String(employeeValue).toLowerCase().startsWith(String(value).toLowerCase());
+          case 'endsWith': return String(employeeValue).toLowerCase().endsWith(String(value).toLowerCase());
+          case '>': return (employeeValue as number) > value;
+          case '<': return (employeeValue as number) < value;
+          default: return true;
         }
       });
     });
